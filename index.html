@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Şablon sunum</title>
+<meta name="description" content="Tek dosyalık, çevrimdışı çalışan etkileşimli sunum şablonu. Kart, tablo, denklem, kanıt etiketi, canlandırma ve kaynak paneli bileşenlerini içerir.">
+<style>
+:root{
+  --primary:#cc785c; --primary-active:#a9583e; --primary-disabled:#e6dfd8;
+  --accent-teal:#5db8a6; --accent-amber:#e8a55a;
+  --canvas:#faf9f5; --surface-soft:#f5f0e8; --surface-card:#efe9de; --surface-cream-strong:#e8e0d2;
+  --surface-dark:#181715; --surface-dark-elevated:#252320; --surface-dark-soft:#1f1e1b;
+  --ink:#141413; --body-strong:#252523; --body:#3d3d3a; --muted:#6c6a64; --muted-soft:#8e8b82;
+  --on-primary:#ffffff; --on-dark:#faf9f5; --on-dark-soft:#a09d96;
+  --hairline:#e6dfd8; --hairline-soft:#ebe6df;
+  --success:#5db872; --warning:#d4a017; --error:#c64545;
+  --teal-ink:#1f5d50; --amber-ink:#7a5010; --coral-ink:#8a4630;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --math:"STIX Two Math","Cambria Math","Latin Modern Math",Georgia,"Times New Roman",serif;
+  --speed:1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:var(--sans); background:var(--surface-soft); color:var(--body);
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+a{color:var(--primary); text-decoration:none; border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--primary)}
+.serif{font-family:var(--serif); font-weight:500}
+:focus-visible{outline:3px solid var(--primary); outline-offset:2px; border-radius:4px}
+
+/* ── top bar ─────────────────────────────────────────────── */
+#bar{
+  position:fixed; top:0; left:0; right:0; height:56px; z-index:40;
+  background:var(--canvas); border-bottom:1px solid var(--hairline);
+  display:flex; align-items:center; gap:16px; padding:0 16px;
+}
+.spike{display:inline-block;width:16px;height:16px;flex:none;position:relative}
+.spike::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:var(--primary);transform:translateY(-50%)}
+.spike::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;
+  background:var(--primary);transform:translate(-50%,-50%);box-shadow:-7px 0 0 -2.2px var(--primary),7px 0 0 -2.2px var(--primary)}
+#bar .wordmark{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:17px;color:var(--ink);letter-spacing:-.3px;white-space:nowrap}
+#bar .deckname{font-size:13px;color:var(--muted);border-left:1px solid var(--hairline);padding-left:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+#bar .grow{margin-left:auto}
+#bar .group{display:flex;align-items:center;gap:8px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:34px;padding:0 14px;border-radius:8px;
+  font-family:inherit;font-size:13px;font-weight:500;line-height:1;
+  border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);
+  cursor:pointer;white-space:nowrap;
+  transition:border-color .15s ease,background .15s ease,color .15s ease;
+}
+.btn:hover:not(:disabled){border-color:var(--muted-soft)}
+.btn:disabled{color:var(--muted-soft);border-color:var(--primary-disabled);cursor:not-allowed}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.btn-primary:hover:not(:disabled){background:var(--primary-active);border-color:var(--primary-active)}
+.btn-sq{width:34px;padding:0}
+.btn.on{background:var(--surface-card);border-color:var(--muted-soft)}
+.btn svg{width:15px;height:15px;flex:none}
+
+#counter{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:52px;text-align:right}
+#progress{position:fixed;top:56px;left:0;right:0;height:2px;background:var(--hairline);z-index:39}
+#progress i{display:block;height:100%;background:var(--primary);width:0;transition:width .25s ease}
+
+/* ── stage ───────────────────────────────────────────────── */
+#deck{position:fixed;top:58px;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{
+  position:absolute;inset:0;width:1280px;height:720px;background:var(--canvas);
+  border:1px solid var(--hairline);border-radius:16px;overflow:hidden;
+  padding:34px 44px 26px;display:flex;flex-direction:column;
+  box-shadow:0 1px 3px rgba(20,20,19,.05);
+}
+.slide[hidden]{display:none!important}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary);margin-bottom:8px}
+.slide h2{font-family:var(--serif);font-weight:500;font-size:35px;line-height:1.12;letter-spacing:-.6px;color:var(--ink);margin:0 0 6px}
+.slide h2.small{font-size:31px}
+.deck-lead{font-size:17px;color:var(--body-strong);margin:0 0 14px;max-width:1000px}
+.slide-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+.foot{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--hairline-soft);padding-top:9px}
+.foot .note{font-size:13px;color:var(--muted);flex:1;min-width:260px}
+
+/* ── evidence chips ──────────────────────────────────────── */
+.ev{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;padding:3px 9px;border-radius:9999px;border:1px solid;white-space:nowrap;line-height:1.3}
+.ev svg{width:11px;height:11px;flex:none}
+.ev-fact{border-color:var(--teal-ink);background:rgba(93,184,166,.20);color:var(--teal-ink)}
+.ev-author{border-style:dashed;border-color:var(--amber-ink);background:rgba(232,165,90,.18);color:var(--amber-ink)}
+.ev-repo{border-color:var(--primary);background:rgba(204,120,92,.16);color:var(--coral-ink)}
+.ev-synth{border-style:dashed;border-color:var(--primary);background:transparent;color:var(--coral-ink)}
+.ev-infer{border-style:dotted;border-color:var(--muted);background:transparent;color:var(--muted)}
+.ev-prop{border-color:var(--ink);background:var(--ink);color:var(--on-dark)}
+.ev-open{border-style:dashed;border-color:var(--muted-soft);background:var(--canvas);color:var(--body-strong)}
+
+/* ── cards, grids ────────────────────────────────────────── */
+.grid{display:grid;gap:12px;min-height:0}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.eq-split{grid-template-columns:1.02fr .98fr}
+.card{background:var(--surface-card);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.card.plain{background:var(--canvas);border:1px solid var(--hairline)}
+.card.dark{background:var(--surface-dark);color:var(--on-dark)}
+.card.dark h3,.card.dark strong{color:var(--on-dark)}
+.card.dark p,.card.dark li{color:var(--on-dark-soft)}
+.card.coral{background:var(--primary);color:var(--on-primary)}
+.card.coral h3{color:var(--on-primary)}
+.card.coral p,.card.coral li{color:rgba(255,255,255,.92)}
+.card h3{font-family:var(--sans);font-size:16px;font-weight:600;line-height:1.35;color:var(--ink);margin:0}
+.card h3 .k{font-family:var(--mono);font-size:12px;color:var(--muted);display:block;font-weight:500;letter-spacing:.4px;margin-bottom:3px}
+.card p{margin:0;font-size:15px;line-height:1.5;color:var(--body)}
+.card ul{margin:0;padding-left:17px;font-size:15px;line-height:1.5;color:var(--body)}
+.card ul li{margin-bottom:5px}
+.card ul li:last-child{margin-bottom:0}
+.card .rows{display:flex;flex-direction:column;gap:5px;font-size:14px}
+.card .rows .r{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--hairline-soft);padding-bottom:4px}
+.card .rows .r:last-child{border-bottom:0;padding-bottom:0}
+.card .rows .r .k{color:var(--muted)}
+.card .rows .r .v{font-family:var(--mono);font-size:13px;color:var(--ink);text-align:right}
+.card.dark .rows .r{border-color:var(--surface-dark-elevated)}
+.card.dark .rows .r .k{color:var(--on-dark-soft)}
+.card.dark .rows .r .v{color:var(--on-dark)}
+.scroll{overflow:auto;min-height:0}
+.tight p,.tight li{font-size:13.5px;line-height:1.42}
+.card.tight{padding:12px 14px;gap:6px}
+.card.tight h3{font-size:15px;line-height:1.3}
+.card.tight ul{padding-left:15px}
+.card.tight ul li{margin-bottom:4px}
+.card.tight .rows{font-size:13px}
+.card.tight .rows .r{padding-bottom:3px}
+
+/* ── tables ──────────────────────────────────────────────── */
+table.t{width:100%;border-collapse:collapse;font-size:14px;line-height:1.4}
+table.t th{text-align:left;font-weight:600;color:var(--ink);font-size:12px;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--muted-soft);padding:6px 9px;vertical-align:bottom;background:var(--canvas)}
+table.t td{padding:7px 9px;border-bottom:1px solid var(--hairline-soft);vertical-align:top;color:var(--body)}
+table.t tr:last-child td{border-bottom:0}
+table.t td.num{font-family:var(--mono);font-size:13px;text-align:right;color:var(--ink);white-space:nowrap}
+table.t td strong{color:var(--ink);font-weight:600}
+table.t.zebra tbody tr:nth-child(odd){background:rgba(239,233,222,.5)}
+table.t.s3t td{font-size:12.8px;padding:5px 8px;line-height:1.35}
+table.t.s3t th{padding:5px 8px}
+table.t.s3t .ev{font-size:10px;padding:2px 7px}
+table.t.s20t td{font-size:12.2px;padding:6px 7px;line-height:1.34}
+table.t.s20t th{padding:5px 7px;font-size:11px}
+table.t.s20t .ev{font-size:10px;padding:2px 6px}
+table.t.s20t .mtest{margin-top:5px;font-size:11.4px;line-height:1.34;color:var(--muted)}
+table.t.s20t .mtest b{color:var(--body);font-weight:600}
+table.t.rankt td{font-size:12.3px;padding:4px 6px;line-height:1.32;border-bottom:1px solid var(--hairline-soft)}
+table.t.rankt .ev{font-size:9.5px;padding:2px 6px}
+.tblwrap{background:var(--surface-card);border-radius:12px;padding:6px 8px;overflow:auto;min-height:0}
+.tblwrap.plain{background:var(--canvas);border:1px solid var(--hairline)}
+
+/* ── mathematics ─────────────────────────────────────────── */
+.mth{font-family:var(--math);font-size:19px;line-height:1.75;color:var(--ink)}
+.mth i,.mth var{font-style:italic;font-family:var(--math)}
+.mth .eqrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
+.mth .tag{float:right;margin-left:20px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;font-style:normal}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;line-height:1.15}
+.frac .n{border-bottom:1px solid currentColor;padding:0 4px 1px}
+.frac .d{padding:1px 4px 0}
+.bigop{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px;line-height:1}
+.bigop .lim{font-size:11px;font-style:normal}
+.bigop .sym{font-size:26px;line-height:.9}
+.cases{display:inline-grid;grid-template-columns:auto auto;gap:2px 14px;vertical-align:middle;align-items:center;border-left:2px solid var(--ink);padding-left:10px;margin-left:4px}
+.cases .cond{font-size:14px;font-style:normal;color:var(--body)}
+.eqbox{background:var(--canvas);border:1px solid var(--hairline);border-left:3px solid var(--primary);border-radius:10px;padding:12px 16px;margin:0}
+.eqbox.dark{background:var(--surface-dark);border-color:var(--surface-dark-elevated);border-left-color:var(--accent-amber)}
+.eqbox.dark .mth{color:var(--on-dark)}
+.eqbox.dark .cases{border-left-color:var(--on-dark)}
+.eqbox.dark .cases .cond{color:var(--on-dark-soft)}
+.symkey{font-size:13px;color:var(--muted);line-height:1.55;margin:8px 0 0}
+.mi{font-family:var(--math);font-size:1.06em;font-style:normal;white-space:nowrap}
+.mi i{font-family:var(--math);font-style:italic}
+.mi sup{font-size:.68em}
+.mi sub{font-size:.68em}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13.5px;line-height:1.42;color:var(--body);margin:2px 0 0}
+.dl dt{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--coral-ink);padding-top:2px;white-space:nowrap}
+.dl dd{margin:0}
+.dl dd b{color:var(--ink);font-weight:600}
+.symkey b{font-family:var(--math);font-style:italic;font-weight:400;color:var(--ink)}
+code,.mono{font-family:var(--mono);font-size:.92em;background:var(--surface-cream-strong);padding:1px 5px;border-radius:4px;color:var(--ink)}
+.card.dark code{background:var(--surface-dark-soft);color:var(--on-dark)}
+
+/* ── animation frame ─────────────────────────────────────── */
+.anim{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+.anim-stage{flex:1;min-height:0;background:var(--surface-card);border-radius:12px;position:relative;overflow:hidden}
+.anim-stage.dark{background:var(--surface-dark)}
+.anim-stage svg{display:block;width:100%;height:100%}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.controls .sep{width:1px;height:22px;background:var(--hairline);margin:0 2px}
+.controls .lbl{font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+.speed{display:inline-flex;border:1px solid var(--hairline);border-radius:8px;overflow:hidden}
+.speed button{border:0;background:var(--canvas);color:var(--ink);font-family:var(--mono);font-size:12px;padding:0 9px;height:32px;cursor:pointer;border-right:1px solid var(--hairline)}
+.speed button:last-child{border-right:0}
+.speed button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.log{background:var(--canvas);border:1px solid var(--hairline);border-radius:10px;padding:8px 12px;font-size:14px;line-height:1.45;color:var(--body-strong);min-height:52px;display:flex;gap:10px;align-items:flex-start}
+.log .tclock{font-family:var(--mono);font-size:12px;color:var(--primary);font-weight:600;padding-top:2px;white-space:nowrap;letter-spacing:.5px}
+.log ol{margin:0;padding-left:18px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--body);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{width:22px;height:12px;flex:none}
+.inspect{position:absolute;right:10px;top:10px;width:262px;max-height:calc(100% - 20px);overflow:auto;background:var(--canvas);border:1px solid var(--muted-soft);border-radius:10px;padding:11px 13px;font-size:13px;box-shadow:0 6px 18px rgba(20,20,19,.14);z-index:5}
+.inspect h4{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px}
+.inspect h4 button{margin-left:auto;border:0;background:transparent;cursor:pointer;color:var(--muted);padding:2px;line-height:0}
+.inspect h4 button svg{width:14px;height:14px}
+.inspect .rows .r{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px solid var(--hairline-soft)}
+.inspect .rows .r:last-child{border-bottom:0}
+.inspect .rows .k{color:var(--muted);font-size:12px}
+.inspect .rows .v{font-family:var(--mono);font-size:12px;color:var(--ink);text-align:right}
+.inspect .prov{margin-top:7px;font-size:10.5px;color:var(--muted);line-height:1.35;border-top:1px solid var(--hairline);padding-top:6px}
+.hint{font-size:12.5px;color:var(--muted)}
+
+/* ── dialogs ─────────────────────────────────────────────── */
+dialog{
+  border:0;border-radius:14px;padding:0;max-width:min(1040px,92vw);width:min(1040px,92vw);
+  max-height:86vh;background:var(--canvas);color:var(--body);
+  box-shadow:0 20px 60px rgba(0,0,0,.28);
+}
+dialog::backdrop{background:rgba(20,20,19,.46)}
+dialog .dhead{display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--hairline);position:sticky;top:0;background:var(--canvas);z-index:2}
+dialog .dhead h3{margin:0;font-family:var(--serif);font-weight:500;font-size:25px;color:var(--ink);letter-spacing:-.3px}
+dialog .dhead .sub{font-size:13px;color:var(--muted)}
+dialog .dbody{padding:18px 22px 24px;overflow:auto;max-height:calc(86vh - 70px);font-size:15px;line-height:1.55}
+dialog .dbody h4{font-size:15px;font-weight:600;color:var(--ink);margin:20px 0 8px}
+dialog .dbody h4:first-child{margin-top:0}
+dialog .dbody p{margin:0 0 10px}
+dialog .dbody ul{margin:0 0 12px;padding-left:20px}
+.srcitem{border:1px solid var(--hairline);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--surface-card)}
+.srcitem .st{font-weight:600;color:var(--ink);font-size:15px;line-height:1.35}
+.srcitem .sid{font-family:var(--mono);font-size:12px;color:var(--primary);margin-top:3px;word-break:break-all}
+.srcitem .sm{font-size:13px;color:var(--body);margin-top:6px;line-height:1.5}
+.srcitem .sm b{color:var(--ink);font-weight:600}
+.srcitem .slim{font-size:13px;color:var(--muted);margin-top:6px;border-top:1px solid var(--hairline-soft);padding-top:6px;line-height:1.5}
+.srcitem .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+/* ── print ───────────────────────────────────────────────── */
+.printonly{display:none}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{overflow:visible;background:#fff;height:auto}
+  #bar,#progress,.controls,.inspect,.noprint,dialog{display:none!important}
+  #deck{position:static;display:block;overflow:visible}
+  #stage{width:auto;height:auto;transform:none!important}
+  .slide{position:static!important;display:flex!important;width:1280px;height:720px;
+    border:0;border-radius:0;box-shadow:none;break-after:page;page-break-after:always;overflow:hidden}
+  .slide[hidden]{display:flex!important}
+  .anim-stage{display:none}
+  .printonly{display:block}
+  .storyboard{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;min-height:0}
+  .storyboard figure{margin:0;display:flex;flex-direction:column;gap:5px;min-height:0;background:var(--surface-card);border-radius:10px;padding:8px;overflow:hidden}
+  .storyboard figure.dark{background:var(--surface-dark)}
+  .storyboard figcaption{font-size:12px;color:var(--muted);line-height:1.35}
+  .storyboard figure.dark figcaption{color:var(--on-dark-soft)}
+  .storyboard .sbox{flex:1;min-height:0}
+  .storyboard svg{width:100%;height:100%;display:block}
+  .scroll,.tblwrap,.card,dialog .dbody{overflow:visible!important}
+  .printsources{display:block!important;margin-top:8px;font-size:11px;color:var(--muted);line-height:1.4;border-top:1px solid var(--hairline);padding-top:6px}
+  #srcindex-print{display:block!important}
+  #srcindex-print .slide{height:auto!important;min-height:720px;display:block!important;overflow:visible!important;
+    break-after:auto;page-break-after:auto}
+  #srcindex-print .slide-body{display:block!important;overflow:visible!important;column-count:2;column-gap:26px}
+  #srcindex-print h3{break-after:avoid;page-break-after:avoid;break-inside:avoid}
+  #srcindex-print p{break-inside:avoid;page-break-inside:avoid}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+.printsources{display:none}
+#srcindex-print{display:none}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+.rm-note{display:none;font-size:13px;color:var(--muted);background:var(--canvas);border:1px dashed var(--muted-soft);border-radius:8px;padding:7px 11px}
+body.reduced .rm-note{display:block}
+</style>
+</head>
+<body>
+
+<!--
+  ŞABLON SUNUM · nasıl kullanılır
+
+  1. Bu dosyayı kopyalayın, <title> ve <meta description> alanlarını değiştirin.
+  2. Her slayt bir <section class="slide"> öğesidir ve şu öznitelikleri taşır:
+       id            benzersiz, DETAILS anahtarı olarak da kullanılır
+       data-title    üst çubukta görünen kısa ad
+       data-sources  boşlukla ayrılmış SRC anahtarları (Kaynaklar paneli ve baskı altbilgisi)
+       data-anim     slaytta canlandırma varsa ANIMS anahtarı
+  3. Slayt gövdesi: .eyebrow, h2, .deck-lead, .slide-body, .foot sırasıyla.
+  4. Veri ve içerik betiğin başındaki dört blokta toplanır: SRC, DETAILS, ANIMS, başlık görseli.
+  5. Tasarım tuvali sabit 1280 x 720 pikseldir ve ekrana ölçeklenir. Bir slayt bu kutuya sığmalıdır;
+     sığmazsa baskıda kırpılır. Sığıp sığmadığını tarayıcı konsolunda şöyle kontrol edebilirsiniz:
+       [...document.querySelectorAll("#stage .slide")].map((s,i)=>{const h=s.hidden;s.hidden=false;
+         const r=s.scrollHeight>s.clientHeight+1;s.hidden=h;return r?i+1:null}).filter(Boolean)
+  6. Dosya tek parçadır: CDN, uzak font, analitik veya çalışma zamanı isteği yoktur.
+     Bu kuralı bozmayın; sunum internetsiz açılabilmelidir.
+  7. Klavye: ok tuşları, PageUp, PageDown, Home, End, s (kaynaklar), d (ayrıntı).
+-->
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-check" viewBox="0 0 16 16"><path d="M2.5 8.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-quote" viewBox="0 0 16 16"><path d="M6 3.5C4 4.4 2.8 6 2.8 8.1v4.4h4.4V8.1H5c0-1.3.4-2.2 1.5-2.9zm7.2 0c-2 .9-3.2 2.5-3.2 4.6v4.4h4.4V8.1h-2.2c0-1.3.4-2.2 1.5-2.9z" fill="currentColor"/></symbol>
+<symbol id="i-db" viewBox="0 0 16 16"><ellipse cx="8" cy="3.6" rx="5.4" ry="2.1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2.6 3.6v8.8c0 1.2 2.4 2.1 5.4 2.1s5.4-.9 5.4-2.1V3.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2.6 8c0 1.2 2.4 2.1 5.4 2.1s5.4-.9 5.4-2.1" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-flask" viewBox="0 0 16 16"><path d="M6.2 1.6v4.1L2.4 12c-.6 1 .1 2.4 1.3 2.4h8.6c1.2 0 1.9-1.4 1.3-2.4L9.8 5.7V1.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 1.6h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-branch" viewBox="0 0 16 16"><circle cx="4" cy="3.2" r="1.9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="4" cy="12.8" r="1.9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12.4" cy="8" r="1.9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 5.1v5.8M5.7 4.2l5.2 2.9M5.7 11.8l5.2-2.9" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+<symbol id="i-compass" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 5.4L9.2 9.2 5.4 10.6 6.8 6.8z" fill="currentColor"/></symbol>
+<symbol id="i-q" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.2 6.1c0-1 .8-1.8 1.8-1.8s1.8.8 1.8 1.8c0 1.4-1.8 1.4-1.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.4" r=".95" fill="currentColor"/></symbol>
+<symbol id="i-play" viewBox="0 0 16 16"><path d="M4 2.6l9 5.4-9 5.4z" fill="currentColor"/></symbol>
+<symbol id="i-pause" viewBox="0 0 16 16"><rect x="3.4" y="2.8" width="3.4" height="10.4" fill="currentColor" rx="1"/><rect x="9.2" y="2.8" width="3.4" height="10.4" fill="currentColor" rx="1"/></symbol>
+<symbol id="i-step" viewBox="0 0 16 16"><path d="M3 2.8l7 5.2-7 5.2z" fill="currentColor"/><rect x="11.4" y="2.8" width="2.4" height="10.4" fill="currentColor" rx="1"/></symbol>
+<symbol id="i-restart" viewBox="0 0 16 16"><path d="M13.4 8a5.4 5.4 0 1 1-1.7-3.9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M13.6 1.9v3.1h-3.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-prev" viewBox="0 0 16 16"><path d="M10 2.6L4.4 8 10 13.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-next" viewBox="0 0 16 16"><path d="M6 2.6L11.6 8 6 13.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-book" viewBox="0 0 16 16"><path d="M2.2 2.6h4.2c.9 0 1.6.7 1.6 1.6v9.2c0-.8-.7-1.4-1.6-1.4H2.2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M13.8 2.6H9.6c-.9 0-1.6.7-1.6 1.6v9.2c0-.8.7-1.4 1.6-1.4h4.2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 16 16"><path d="M2 4.4h12M2 8h12M2 11.6h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="5.4" cy="4.4" r="1.7" fill="var(--canvas)" stroke="currentColor" stroke-width="1.4"/><circle cx="10.2" cy="8" r="1.7" fill="var(--canvas)" stroke="currentColor" stroke-width="1.4"/><circle cx="6.6" cy="11.6" r="1.7" fill="var(--canvas)" stroke="currentColor" stroke-width="1.4"/></symbol>
+<symbol id="i-expand" viewBox="0 0 16 16"><path d="M2.4 6V2.4H6M10 2.4h3.6V6M13.6 10v3.6H10M6 13.6H2.4V10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-print" viewBox="0 0 16 16"><path d="M4.4 6V1.9h7.2V6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="1.6" y="6" width="12.8" height="5.4" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4.4 9.6h7.2v4.5H4.4z" fill="var(--canvas)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+<symbol id="i-close" viewBox="0 0 16 16"><path d="M3.4 3.4l9.2 9.2M12.6 3.4l-9.2 9.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+<symbol id="i-index" viewBox="0 0 16 16"><path d="M2.4 3.4h11.2M2.4 8h11.2M2.4 12.6h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.2V8l2.7 1.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-mem" viewBox="0 0 16 16"><rect x="2.6" y="4.6" width="10.8" height="7.4" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.6 4.6V2.4M8 4.6V2.4M10.4 4.6V2.4M5.6 14v-2M8 14v-2M10.4 14v-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+<symbol id="i-wave" viewBox="0 0 16 16"><path d="M1 6.2c1.6-2.1 3.1-2.1 4.7 0s3.1 2.1 4.7 0 3.1-2.1 4.6 0M1 11c1.6-2.1 3.1-2.1 4.7 0s3.1 2.1 4.7 0 3.1-2.1 4.6 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-sat" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4.6 4.6L2.2 2.2M11.4 4.6l2.4-2.4M4.6 11.4l-2.4 2.4M11.4 11.4l2.4 2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 16 16"><path d="M9.2 1.4L3.4 9h3.8l-.8 5.6L12.6 7H8.8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+<symbol id="i-target" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r=".9" fill="currentColor"/></symbol>
+</defs></svg>
+
+<header id="bar">
+  <span class="wordmark"><span class="spike" aria-hidden="true"></span>Sunum adı</span>
+  <span class="deckname" id="deckname">Kuantum ağlarında hangi problemi çalışabiliriz?</span>
+  <span class="grow"></span>
+  <span class="group">
+    <button class="btn" id="btn-sources" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-book"/></svg>Kaynaklar</button>
+    <button class="btn" id="btn-details" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-sliders"/></svg>Ayrıntı</button>
+    <button class="btn" id="btn-index" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-index"/></svg>Kaynak dizini</button>
+  </span>
+  <span class="sep" style="width:1px;height:24px;background:var(--hairline)"></span>
+  <span class="group">
+    <button class="btn btn-sq" id="btn-full" aria-label="Tam ekran"><svg aria-hidden="true"><use href="#i-expand"/></svg></button>
+    <button class="btn btn-sq" id="btn-print" aria-label="PDF'e aktar"><svg aria-hidden="true"><use href="#i-print"/></svg></button>
+    <button class="btn btn-sq" id="btn-prev" aria-label="Önceki slayt"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+    <button class="btn btn-sq" id="btn-next" aria-label="Sonraki slayt"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
+    <span id="counter" aria-live="polite">1 / 23</span>
+  </span>
+</header>
+<div id="progress" aria-hidden="true"><i id="progressbar"></i></div>
+
+<main id="deck">
+<div id="stage">
+
+<!-- ══════════ 1 · başlık slaydı ══════════
+     data-title  : üst çubukta ve baskı altbilgisinde görünen kısa ad
+     data-sources: bu slaytta kullanılan kaynak anahtarları (SRC nesnesindeki anahtarlar)
+     data-anim   : slaytta canlandırma varsa ANIMS anahtarı                        -->
+<section class="slide" id="s1" data-title="Sunum başlığı" data-sources="ornek-kaynak ornek-depo">
+  <div class="slide-body" style="justify-content:center">
+    <div class="grid" style="grid-template-columns:1.12fr .88fr;gap:36px;align-items:center">
+      <div>
+        <p class="eyebrow">Alt başlık, Ay Yıl</p>
+        <h2 style="font-size:52px;line-height:1.05;letter-spacing:-1.2px;margin-bottom:18px">Sunumun ana sorusu buraya</h2>
+        <p style="font-family:var(--serif);font-size:25px;color:var(--body-strong);margin:0 0 20px">Ad Soyad ve Ad Soyad</p>
+        <p class="deck-lead" style="max-width:520px">Tek cümlelik çerçeve: elimizde ne var, bu sunum neyi gösteriyor, sonunda hangi soru tartışılacak.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>Durum etiketi</span>
+          <span class="ev ev-open"><svg aria-hidden="true"><use href="#i-q"/></svg>Açık soru etiketi</span>
+        </div>
+      </div>
+      <div class="anim-stage" style="height:420px;background:var(--surface-dark)" id="titlefig-host"></div>
+    </div>
+  </div>
+  <div class="foot">
+    <span class="note">Altbilgi: görselin ne gösterdiğini bir cümleyle söyleyin. Baskıda bu satırın altına kaynak listesi eklenir.</span>
+  </div>
+</section>
+
+<!-- ══════════ 2 · bileşen şablonları ══════════ -->
+<section class="slide" id="s2" data-title="Bileşen şablonları" data-sources="ornek-kaynak">
+  <p class="eyebrow">Şablon sayfası</p>
+  <h2>Hangi bileşenler hazır?</h2>
+  <p class="deck-lead">Bu slayt kopyalanabilir bileşenleri gösterir: kartlar, kanıt etiketleri, anahtar-değer satırları, tablo, denklem kutusu ve tanım listesi.</p>
+  <div class="slide-body">
+    <div class="grid g3" style="flex:none">
+      <div class="card">
+        <h3><span class="k">card</span>Standart kart</h3>
+        <p>Gövde metni. Kart <span class="mono">.card</span>, üst etiket <span class="mono">.k</span>, gövde <span class="mono">p</span>.</p>
+        <div class="rows">
+          <div class="r"><span class="k">Anahtar</span><span class="v">değer</span></div>
+          <div class="r"><span class="k">İkinci anahtar</span><span class="v">12 / 34</span></div>
+        </div>
+      </div>
+      <div class="card plain">
+        <h3><span class="k">card plain</span>Çerçeveli kart</h3>
+        <p>Açık zeminli, ince çerçeveli kart. Denklem ve şekil yanına iyi oturur.</p>
+        <dl class="dl">
+          <dt>A1</dt><dd>tanım listesi satırı, kısa açıklama</dd>
+          <dt>A2</dt><dd>ikinci satır</dd>
+        </dl>
+      </div>
+      <div class="card dark">
+        <h3><span class="k">card dark</span>Vurgu kartı</h3>
+        <p>Koyu kart, slaytta en çok bir kez kullanılır. Sonuç veya uyarı için.</p>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1.15fr .85fr;flex:1;min-height:0">
+      <div class="tblwrap plain" style="align-self:start">
+        <table class="t zebra">
+          <thead><tr><th style="width:26%">Sütun</th><th style="width:22%">Kanıt türü</th><th>Açıklama</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Birinci satır</strong></td><td><span class="ev ev-fact">olgu</span></td><td>Kısa açıklama metni.</td></tr>
+            <tr><td><strong>İkinci satır</strong></td><td><span class="ev ev-author">beyan</span></td><td>Kısa açıklama metni.</td></tr>
+            <tr><td><strong>Üçüncü satır</strong></td><td><span class="ev ev-synth">sentetik</span></td><td>Kısa açıklama metni.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-height:0">
+        <div class="eqbox">
+          <div class="mth" style="font-size:18px">
+            <i>x</i><sub><i>t</i>+1</sub> = <i>A</i> <i>h<sub>t</sub></i> +
+            <span class="bigop"><span class="lim"></span><span class="sym">&sum;</span><span class="lim"><i>e</i></span></span>
+            &Gamma;<sub><i>e</i></sub> <i>g</i><sub><i>e</i>,<i>t</i></sub><span class="tag">Denklem etiketi</span></div>
+          <p class="symkey"><b>x</b> durum, <b>h</b> tutulan, <b>g</b> üretim. Satır içi matematik için <span class="mono">.mi</span>: <span class="mi"><i>p</i><sub>sw</sub> &ge; 0</span>.</p>
+        </div>
+        <div class="card tight" style="flex:1">
+          <h3>Kanıt etiketleri</h3>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="ev ev-fact"><svg aria-hidden="true"><use href="#i-check"/></svg>olgu</span>
+            <span class="ev ev-author"><svg aria-hidden="true"><use href="#i-quote"/></svg>yazar beyanı</span>
+            <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>depo sonucu</span>
+            <span class="ev ev-synth"><svg aria-hidden="true"><use href="#i-flask"/></svg>sentetik</span>
+            <span class="ev ev-infer"><svg aria-hidden="true"><use href="#i-branch"/></svg>çıkarım</span>
+            <span class="ev ev-prop"><svg aria-hidden="true"><use href="#i-compass"/></svg>öneri</span>
+            <span class="ev ev-open"><svg aria-hidden="true"><use href="#i-q"/></svg>açık soru</span>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-top:auto">Her etiket renkten bağımsız olarak biçimle de ayrışır: kenarlık düz, kesikli veya noktalı.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>Örnek etiket</span>
+    <span class="note">Altbilgi notu: slaytın sınırını veya uyarısını buraya yazın.</span>
+  </div>
+</section>
+
+<!-- ══════════ 3 · canlandırma şablonu ══════════ -->
+<section class="slide" id="s3" data-title="Canlandırma şablonu" data-sources="ornek-depo" data-anim="demo">
+  <p class="eyebrow">Adım adım anlatım</p>
+  <h2>Canlandırma nasıl kurulur?</h2>
+  <div class="anim">
+    <div class="controls" data-controls="demo"></div>
+    <div class="anim-stage" data-stage="demo"></div>
+    <div class="log" data-log="demo"></div>
+    <div class="rm-note">Hareket azaltma açık. Canlandırma kendiliğinden oynamaz; adımların tamamı yukarıda listeleniyor.</div>
+    <div class="storyboard printonly" data-storyboard="demo"></div>
+  </div>
+  <div class="foot">
+    <span class="ev ev-synth"><svg aria-hidden="true"><use href="#i-flask"/></svg>Örnek veri</span>
+    <span class="note">Canlandırma duraklamış başlar. Baskıda üç kareli storyboard'a dönüşür: başlangıç, ara karar, son durum.</span>
+  </div>
+</section>
+
+</div>
+</main>
+
+<section id="srcindex-print"></section>
+
+<dialog id="dlg-sources" aria-labelledby="dlg-sources-t">
+  <div class="dhead"><h3 id="dlg-sources-t">Kaynaklar</h3><span class="sub" id="dlg-sources-sub"></span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dbody" id="dlg-sources-body"></div>
+</dialog>
+<dialog id="dlg-details" aria-labelledby="dlg-details-t">
+  <div class="dhead"><h3 id="dlg-details-t">Ayrıntı</h3><span class="sub" id="dlg-details-sub"></span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dbody" id="dlg-details-body"></div>
+</dialog>
+<dialog id="dlg-index" aria-labelledby="dlg-index-t">
+  <div class="dhead"><h3 id="dlg-index-t">Kaynak dizini</h3><span class="sub">Bu sunumda kullanılan bütün kaynaklar ve kanıt sınıfları</span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dbody" id="dlg-index-body"></div>
+</dialog>
+<dialog id="dlg-lit" aria-labelledby="dlg-lit-t">
+  <div class="dhead"><h3 id="dlg-lit-t">Kategori</h3><span class="sub" id="dlg-lit-sub"></span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dbody" id="dlg-lit-body"></div>
+</dialog>
+
+<script>
+"use strict";
+/* ─────────── yardımcılar ─────────── */
+const NS="http://www.w3.org/2000/svg";
+function E(tag,at,kids){const n=document.createElementNS(NS,tag);
+  if(at)for(const k in at){if(at[k]===null||at[k]===undefined)continue;n.setAttribute(k,at[k]);}
+  if(kids)(Array.isArray(kids)?kids:[kids]).forEach(c=>n.appendChild(typeof c==="string"?document.createTextNode(c):c));
+  return n;}
+function H(tag,at,kids){const n=document.createElement(tag);
+  if(at)for(const k in at){if(k==="html")n.innerHTML=at[k];else if(at[k]!==null&&at[k]!==undefined)n.setAttribute(k,at[k]);}
+  if(kids)(Array.isArray(kids)?kids:[kids]).forEach(c=>n.appendChild(typeof c==="string"?document.createTextNode(c):c));
+  return n;}
+function mk(vb,label){const s=E("svg",{viewBox:vb,preserveAspectRatio:"xMidYMid meet",role:"img","aria-label":label});return s;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+const C={ink:"#141413",body:"#3d3d3a",muted:"#6c6a64",soft:"#8e8b82",hair:"#e6dfd8",card:"#efe9de",
+  canvas:"#faf9f5",dark:"#181715",darkEl:"#252320",coral:"#cc785c",coralD:"#a9583e",teal:"#5db8a6",
+  tealD:"#2d7d6c",amber:"#e8a55a",amberD:"#a06a1e",onDark:"#faf9f5",onDarkSoft:"#a09d96"};
+
+/* durum simgeleri: renk tek kodlama değil, biçim de ayırt eder */
+function markOk(x,y,r,col){const g=E("g",{});g.appendChild(E("circle",{cx:x,cy:y,r:r,fill:col}));
+  g.appendChild(E("path",{d:`M${x-r*.5} ${y} l${r*.35} ${r*.4} l${r*.7} -${r*.85}`,fill:"none",stroke:"#fff","stroke-width":r*.28,"stroke-linecap":"round","stroke-linejoin":"round"}));return g;}
+function markNo(x,y,r,col){const g=E("g",{});g.appendChild(E("circle",{cx:x,cy:y,r:r,fill:"none",stroke:col,"stroke-width":r*.3}));
+  g.appendChild(E("path",{d:`M${x-r*.45} ${y-r*.45} L${x+r*.45} ${y+r*.45} M${x+r*.45} ${y-r*.45} L${x-r*.45} ${y+r*.45}`,stroke:col,"stroke-width":r*.3,"stroke-linecap":"round"}));return g;}
+function svgMath(x,y,parts,at){
+  const o=Object.assign({},at||{});const prose=o.prose;delete o.prose;
+  const t=E("text",Object.assign({x:x,y:y,style:"font-family:var(--math)","font-size":15,fill:C.ink},o));
+  let cur=0;
+  const push=(txt,off,attrs)=>{const a=Object.assign({},attrs);
+    if(off!==cur){a.dy=off-cur;cur=off;}
+    t.appendChild(E("tspan",a,txt));};
+  parts.forEach(p=>{
+    if(typeof p==="string"){push(p,0,prose?{style:"font-family:system-ui,sans-serif"}:{"font-style":"normal"});return;}
+    push(p[0],0,{"font-style":p[2]==="upright"?"normal":"italic"});
+    if(p[1])push(String(p[1]),-5,{"font-size":"66%","font-style":"normal"});
+    if(p[3])push(String(p[3]),4,{"font-size":"66%","font-style":String(p[3]).length>1?"normal":"italic"});
+  });
+  return t;
+}
+function txt(x,y,s,at){return E("text",Object.assign({x:x,y:y,"text-anchor":"middle","dominant-baseline":"middle",
+  "font-family":"system-ui,-apple-system,sans-serif","font-size":13,fill:C.body},at||{}),String(s));}
+
+const EVLABEL={fact:"Kaynak doğrulanmış olgu",author:"Kaynak yazarının beyanı",repo:"Doğrulanmış depo sonucu",
+  synth:"Sınırlı sentetik sonuç",infer:"Makul çıkarım",prop:"Önerilen araştırma yönü",open:"Çözülmemiş soru"};
+const EVICON={fact:"i-check",author:"i-quote",repo:"i-db",synth:"i-flask",infer:"i-branch",prop:"i-compass",open:"i-q"};
+function reduced(){return window.matchMedia("(prefers-reduced-motion: reduce)").matches;}
+const RUN={};
+
+/* ═══════════ 1. KAYNAK KAYITLARI ═══════════
+   Her slaytın data-sources özniteliğinde bu anahtarlar geçer.
+   ev alanı kanıt sınıfını verir: fact | author | repo | synth | infer | prop | open
+   group alanı kaynak dizinindeki başlığı belirler.                              */
+const SRC={
+"ornek-kaynak":{t:"Örnek makale başlığı",sid:"yazar2026kisabaslik",group:"Birincil kaynaklar",
+  ref:"pdfs/main/ornek.pdf",url:"https://arxiv.org/abs/0000.00000",
+  ver:"İncelenen sürüm: arXiv v1",loc:"s. 3, Eq. (5)-(7)",ev:"fact",
+  lim:"Neyin doğrulanmadığını buraya yazın. Boş bırakmayın."},
+"ornek-depo":{t:"Örnek depo kaydı",sid:null,group:"Depo kayıtları",
+  ref:"docs/ornek.md",url:null,
+  ver:"1 Ocak 2026",loc:"Bölüm 2",ev:"repo",
+  lim:"Sınırlı bir alanda geçerli. Genel bir sonuç kurmaz."}
+};
+
+/* ═══════════ 2. AYRINTI PANELLERİ ═══════════
+   Anahtar slaytın id'sidir. Tam denklemler, uzun tablolar ve çözücü alanları buraya.  */
+const DETAILS={
+ s2:{t:"Bileşen şablonlarının tam listesi",h:`
+  <h4>Yerleşim</h4>
+  <p>Izgara sınıfları: <span class="mono">.grid.g2</span>, <span class="mono">.g3</span>, <span class="mono">.g4</span>,
+  <span class="mono">.eq-split</span>. Tasarım tuvali sabit 1280 &times; 720 pikseldir; içerik taşarsa baskıda kırpılır.</p>
+  <h4>Yoğunluk ön ayarları</h4>
+  <ul>
+   <li><span class="mono">.card.tight</span> daha küçük iç boşluk ve punto.</li>
+   <li><span class="mono">table.t.s3t</span>, <span class="mono">.s20t</span>, <span class="mono">.rankt</span> sıkışık tablo varyantları.</li>
+  </ul>
+  <h4>Matematik</h4>
+  <p>Blok denklem <span class="mono">.eqbox &gt; .mth</span>, satır içi <span class="mono">.mi</span>,
+  SVG içinde <span class="mono">svgMath(x,y,parts)</span>. Değişkenler italik, etiketler dik yazılır.</p>`},
+ s3:{t:"Canlandırma tanımının şekli",h:`
+  <h4>ANIMS kaydı</h4>
+  <p>Her canlandırma <span class="mono">frames</span> dizisi, saf bir <span class="mono">render(host,i,print)</span>
+  fonksiyonu, <span class="mono">log(i)</span> ve baskı storyboard'unun orta karesi için <span class="mono">mid</span> alanı taşır.</p>
+  <h4>Kurallar</h4>
+  <ul>
+   <li>Aynı render fonksiyonu hem canlı görünümde hem baskı storyboard'unda kullanılır.</li>
+   <li>Canlandırma duraklamış başlar; slayt değişince başa döner.</li>
+   <li>Hareket azaltma açıkken otomatik oynatma yapılmaz, bütün adımlar liste olarak gösterilir.</li>
+  </ul>`}
+};
+
+/* ═══════════ 3. CANLANDIRMALAR ═══════════ */
+const DEMO_FRAMES=[
+ {sel:-1,note:"Başlangıç: hiçbir düğüm seçili değil."},
+ {sel:0, note:"Birinci düğüm seçildi."},
+ {sel:1, note:"Karar ikinci düğüme taşındı."},
+ {sel:2, note:"Son durum: üçüncü düğüm seçili."}
+];
+function demoRender(host,i,print){
+  const f=DEMO_FRAMES[i];
+  const s=mk("0 0 720 260","Üç kutulu örnek canlandırma karesi.");
+  const xs=[110,340,570];
+  xs.forEach((x,k)=>{
+    if(k<2)s.appendChild(E("line",{x1:x+62,y1:120,x2:xs[k+1]-62,y2:120,
+      stroke:k<f.sel?C.coral:C.hair,"stroke-width":k<f.sel?3:2,"stroke-dasharray":k<f.sel?null:"6 5"}));
+  });
+  xs.forEach((x,k)=>{
+    const on=(k===f.sel);
+    s.appendChild(E("rect",{x:x-62,y:88,width:124,height:64,rx:12,
+      fill:on?C.coral:C.canvas,stroke:on?C.coralD:C.hair,"stroke-width":on?2:1.4}));
+    s.appendChild(txt(x,112,"Adım "+(k+1),{"font-size":14,"font-weight":600,fill:on?"#fff":C.ink}));
+    s.appendChild(txt(x,132,"durum "+k,{"font-size":12,fill:on?"rgba(255,255,255,.86)":C.muted}));
+  });
+  s.appendChild(svgMath(360,206,["seçili düğüm: ",["k","",null,"t"],f.sel<0?" yok":" = "+f.sel],
+    {"font-size":14,fill:C.muted,"text-anchor":"middle",prose:true}));
+  host.appendChild(s);
+}
+const ANIMS={
+ demo:{frames:DEMO_FRAMES,mid:1,dark:false,render:demoRender,
+   log:i=>({clock:"adım "+(i+1),text:DEMO_FRAMES[i].note})}
+};
+
+/* ═══════════ 4. BAŞLIK GÖRSELİ ═══════════ */
+function titleFigure(host){
+  const s=mk("0 0 460 420","Örnek başlık görseli: üç düğümlü zincir ve genel graf.");
+  const nodes=[[80,120],[230,80],[380,120],[150,260],[310,260],[230,350]];
+  const edges=[[0,1],[1,2],[0,3],[3,4],[4,2],[3,5],[5,4]];
+  edges.forEach(([a,b])=>s.appendChild(E("line",{x1:nodes[a][0],y1:nodes[a][1],x2:nodes[b][0],y2:nodes[b][1],
+    stroke:C.darkEl,"stroke-width":1.6})));
+  [[0,3],[3,5],[5,4],[4,2]].forEach(([a,b])=>s.appendChild(E("line",{x1:nodes[a][0],y1:nodes[a][1],
+    x2:nodes[b][0],y2:nodes[b][1],stroke:C.coral,"stroke-width":3})));
+  nodes.forEach((p,k)=>{
+    const end=(k===0||k===2);
+    s.appendChild(E("circle",{cx:p[0],cy:p[1],r:end?15:11,fill:end?C.coral:C.darkEl,
+      stroke:end?"none":C.onDarkSoft,"stroke-width":1}));
+  });
+  s.appendChild(E("text",{x:26,y:400,"font-family":"system-ui,sans-serif","font-size":12,fill:C.onDarkSoft},
+    "Görsel açıklaması buraya."));
+  host.appendChild(s);
+}
+
+/* ─────────── canlandırma motoru ─────────── */
+function buildAnim(key){
+  const def=ANIMS[key];
+  const stage=document.querySelector('[data-stage="'+key+'"]');
+  const ctr=document.querySelector('[data-controls="'+key+'"]');
+  const logEl=document.querySelector('[data-log="'+key+'"]');
+  const sb=document.querySelector('[data-storyboard="'+key+'"]');
+  const N=def.frames.length;
+  const st={i:0,timer:null,speed:1};
+  RUN[key]=st;
+  const b=(id,icon,label,cls)=>{const n=H("button",{class:"btn"+(cls?" "+cls:""),type:"button"});
+    n.innerHTML='<svg aria-hidden="true"><use href="#i-'+icon+'"/></svg>'+label;n.dataset.act=id;return n;};
+  const bPlay=b("play","play","Oynat","btn-primary"), bPause=b("pause","pause","Duraklat"),
+        bStep=b("step","step","Adım"), bRestart=b("restart","restart","Baştan");
+  ctr.append(bPlay,bPause,bStep,bRestart);
+  ctr.appendChild(H("span",{class:"sep"}));
+  ctr.appendChild(H("span",{class:"lbl"},"Hız"));
+  const sp=H("div",{class:"speed",role:"group","aria-label":"Canlandırma hızı"});
+  [[0.5,"0,5×"],[1,"1×"],[2,"2×"]].forEach(([v,l])=>{
+    const n=H("button",{type:"button","aria-pressed":v===1?"true":"false"},l);
+    n.addEventListener("click",()=>{st.speed=v;sp.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));
+      n.setAttribute("aria-pressed","true");if(st.timer)start();});
+    sp.appendChild(n);});
+  ctr.appendChild(sp);
+  ctr.appendChild(H("span",{class:"sep"}));
+  const pos=H("span",{class:"lbl","aria-live":"polite"});
+  ctr.appendChild(pos);
+  function draw(){
+    stage.innerHTML="";
+    def.render(stage,st.i,false);
+    const L=def.log(st.i);
+    logEl.innerHTML="";
+    if(reduced()){
+      logEl.appendChild(H("span",{class:"tclock"},"TÜM ADIMLAR"));
+      const ol=H("ol",{});
+      def.frames.forEach((f,k)=>{const li=H("li",{style:k===st.i?"color:var(--ink);font-weight:600":""},
+        def.log(k).clock+": "+def.log(k).text);ol.appendChild(li);});
+      logEl.appendChild(ol);
+    } else {
+      logEl.appendChild(H("span",{class:"tclock"},L.clock));
+      logEl.appendChild(H("span",{},L.text));
+    }
+    pos.textContent="Adım "+(st.i+1)+" / "+N;
+    bPlay.disabled=!!st.timer||st.i>=N-1;
+    bPause.disabled=!st.timer;
+    bStep.disabled=st.i>=N-1;
+  }
+  function start(){stop();st.timer=setInterval(()=>{if(st.i<N-1){st.i++;draw();}else stop();},2100/st.speed);draw();}
+  function stop(){if(st.timer){clearInterval(st.timer);st.timer=null;}draw();}
+  bPlay.addEventListener("click",()=>{if(st.i>=N-1)st.i=0;start();});
+  bPause.addEventListener("click",stop);
+  bStep.addEventListener("click",()=>{stop();if(st.i<N-1){st.i++;draw();}});
+  bRestart.addEventListener("click",()=>{stop();st.i=0;draw();});
+  st.reset=()=>{stop();st.i=0;draw();};
+  st.stop=stop;
+  /* baskı için üç kareli storyboard */
+  const idx=[0,def.mid,N-1];
+  const caps=["başlangıç durumu","ara karar","son durum"];
+  idx.forEach((k,q)=>{
+    const fig=H("figure",{class:def.dark?"dark":""});
+    const boxEl=H("div",{class:"sbox"});
+    def.render(boxEl,k,true);
+    fig.appendChild(boxEl);
+    fig.appendChild(H("figcaption",{},caps[q]+" · "+def.log(k).clock+": "+def.log(k).text));
+    sb.appendChild(fig);
+  });
+  draw();
+}
+
+/* ─────────── ayrıntı panelleri ─────────── */
+
+/* ─────────── kaynak ve ayrıntı panelleri ─────────── */
+function srcCard(id){
+  const s=SRC[id];if(!s)return null;
+  const d=H("div",{class:"srcitem"});
+  d.appendChild(H("div",{class:"st"},s.t));
+  if(s.sid)d.appendChild(H("div",{class:"sid"},"study_id: "+s.sid));
+  const bits=[];
+  bits.push("<b>Konum:</b> "+esc(s.ref));
+  if(s.url)bits.push('<b>Bağlantı:</b> <a href="'+esc(s.url)+'" target="_blank" rel="noreferrer">'+esc(s.url)+"</a>");
+  bits.push("<b>İncelenen sürüm:</b> "+esc(s.ver));
+  bits.push("<b>İncelenen yer:</b> "+s.loc);
+  d.appendChild(H("div",{class:"sm",html:bits.join("<br>")}));
+  const ch=H("div",{class:"chips"});
+  const c=H("span",{class:"ev ev-"+s.ev});
+  c.innerHTML='<svg aria-hidden="true"><use href="#'+EVICON[s.ev]+'"/></svg>'+EVLABEL[s.ev];
+  ch.appendChild(c); d.appendChild(ch);
+  d.appendChild(H("div",{class:"slim",html:"<b>Sınır:</b> "+s.lim}));
+  return d;
+}
+function openSources(slide){
+  const ids=(slide.dataset.sources||"").split(/\s+/).filter(Boolean);
+  document.getElementById("dlg-sources-sub").textContent=slide.dataset.title+" · "+ids.length+" kaynak";
+  const b=document.getElementById("dlg-sources-body");b.innerHTML="";
+  if(!ids.length)b.appendChild(H("p",{},"Bu slayt için ayrı bir kaynak kaydı yok."));
+  ids.forEach(id=>{const c=srcCard(id);if(c)b.appendChild(c);});
+  b.appendChild(H("p",{style:"color:var(--muted);font-size:13.5px;margin-top:16px"},
+    "Depo düzyazısı, geri getirilen metin, RAG çıktısı ve model incelemeleri; özgün bir makalenin, denklemin, makbuzun veya bağımsız bir kontrolün yerini tutmaz."));
+  document.getElementById("dlg-sources").showModal();
+}
+function openDetails(slide){
+  const d=DETAILS[slide.id];
+  document.getElementById("dlg-details-sub").textContent=slide.dataset.title;
+  const b=document.getElementById("dlg-details-body");b.innerHTML="";
+  if(d){document.getElementById("dlg-details-t").textContent=d.t;b.innerHTML=d.h;}
+  else{document.getElementById("dlg-details-t").textContent="Ayrıntı";
+    b.appendChild(H("p",{},"Bu slaytta gösterilenin ötesinde ayrı bir teknik döküm yok. Kaynak kayıtları için Kaynaklar panelini açın."));}
+  document.getElementById("dlg-details").showModal();
+}
+
+/* ─────────── gezinme ─────────── */
+const slides=[...document.querySelectorAll("#stage .slide")];
+let cur=0;
+function scaleStage(){
+  const st=document.getElementById("stage"),deck=document.getElementById("deck");
+  const s=Math.min((deck.clientWidth-28)/1280,(deck.clientHeight-28)/720);
+  st.style.transform="scale("+s.toFixed(4)+")";
+}
+function show(n){
+  n=Math.max(0,Math.min(slides.length-1,n));
+  const prev=slides[cur];
+  if(prev&&prev.dataset.anim&&RUN[prev.dataset.anim])RUN[prev.dataset.anim].reset();
+  slides.forEach((s,k)=>{s.hidden=(k!==n);});
+  cur=n;
+  const s=slides[cur];
+  document.getElementById("counter").textContent=(n+1)+" / "+slides.length;
+  document.getElementById("deckname").textContent=s.dataset.title;
+  document.getElementById("progressbar").style.width=((n+1)/slides.length*100)+"%";
+  document.getElementById("btn-prev").disabled=(n===0);
+  document.getElementById("btn-next").disabled=(n===slides.length-1);
+  document.getElementById("btn-sources").disabled=!(s.dataset.sources||"").trim();
+  const db=document.getElementById("btn-details");
+  db.disabled=false; db.classList.toggle("on",!!DETAILS[s.id]);
+  s.querySelectorAll(".inspect").forEach(x=>x.remove());
+}
+document.getElementById("btn-prev").addEventListener("click",()=>show(cur-1));
+document.getElementById("btn-next").addEventListener("click",()=>show(cur+1));
+document.getElementById("btn-sources").addEventListener("click",()=>openSources(slides[cur]));
+document.getElementById("btn-details").addEventListener("click",()=>openDetails(slides[cur]));
+document.getElementById("btn-index").addEventListener("click",()=>document.getElementById("dlg-index").showModal());
+document.getElementById("btn-print").addEventListener("click",()=>{
+  Object.keys(RUN).forEach(k=>RUN[k].stop&&RUN[k].stop());
+  slides.forEach(s=>s.querySelectorAll(".inspect").forEach(x=>x.remove()));
+  window.print();});
+document.getElementById("btn-full").addEventListener("click",()=>{
+  if(document.fullscreenElement)document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();});
+document.querySelectorAll("dialog [data-close]").forEach(b=>b.addEventListener("click",()=>b.closest("dialog").close()));
+document.querySelectorAll("dialog").forEach(d=>d.addEventListener("click",e=>{if(e.target===d)d.close();}));
+document.addEventListener("keydown",e=>{
+  if(document.querySelector("dialog[open]")){if(e.key==="Escape")return;return;}
+  const t=e.target;
+  if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+  switch(e.key){
+    case "ArrowRight":case "PageDown":case " ":e.preventDefault();show(cur+1);break;
+    case "ArrowLeft":case "PageUp":e.preventDefault();show(cur-1);break;
+    case "Home":e.preventDefault();show(0);break;
+    case "End":e.preventDefault();show(slides.length-1);break;
+    case "s":case "S":if((slides[cur].dataset.sources||"").trim())openSources(slides[cur]);break;
+    case "d":case "D":openDetails(slides[cur]);break;
+  }
+});
+window.addEventListener("resize",scaleStage);
+window.addEventListener("beforeprint",()=>{slides.forEach(s=>{s.hidden=false;});});
+window.addEventListener("afterprint",()=>{slides.forEach((s,k)=>{s.hidden=(k!==cur);});});
+
+/* ═══════════ KAYNAK DİZİNİ ═══════════ */
+function buildIndex(){
+  const b=document.getElementById("dlg-index-body");
+  const groups={};
+  Object.keys(SRC).forEach(id=>{const g=SRC[id].group||"Diğer";(groups[g]=groups[g]||[]).push(id);});
+  b.innerHTML="";
+  b.appendChild(H("p",{},"Kanıt sınıfları: kaynak doğrulanmış olgu, kaynak yazarının beyanı, doğrulanmış depo sonucu, "+
+    "sınırlı sentetik sonuç, makul çıkarım, önerilen araştırma yönü, çözülmemiş soru. "+
+    "Harici bağlantılar yalnızca internet varsa açılır; sunumun hiçbir işlevi onlara bağlı değil."));
+  Object.keys(groups).forEach(g=>{
+    b.appendChild(H("h4",{},g));
+    groups[g].forEach(id=>{const c=srcCard(id);if(c)b.appendChild(c);});
+  });
+  const p=document.getElementById("srcindex-print");
+  p.innerHTML='<div class="slide" style="display:flex"><p class="eyebrow">Ek</p><h2>Kaynak dizini</h2><div class="slide-body scroll" id="sip"></div></div>';
+  const host=p.querySelector("#sip");
+  Object.keys(groups).forEach(g=>{
+    host.appendChild(H("h3",{style:"font-size:14px;margin:10px 0 4px;color:var(--ink)"},g));
+    groups[g].forEach(id=>{const x=SRC[id];
+      host.appendChild(H("p",{style:"font-size:11.5px;margin:0 0 4px;line-height:1.4",
+        html:"<b>"+esc(x.t)+"</b>"+(x.sid?" ("+esc(x.sid)+")":"")+" · "+esc(x.ref)+" · "+esc(x.ver)+" · "+
+             EVLABEL[x.ev]+". Sınır: "+x.lim}));
+    });
+  });
+}
+
+/* ═══════════ BAŞLATMA ═══════════ */
+function init(){
+  if(reduced())document.body.classList.add("reduced");
+  titleFigure(document.getElementById("titlefig-host"));
+  Object.keys(ANIMS).forEach(buildAnim);
+  buildIndex();
+  slides.forEach(s=>{
+    const ids=(s.dataset.sources||"").split(/\s+/).filter(Boolean);
+    if(!ids.length)return;
+    const f=s.querySelector(".foot");if(!f)return;
+    const t=ids.map(id=>{const x=SRC[id];return x?(x.sid?x.sid:x.t)+" ["+EVLABEL[x.ev].toLowerCase()+"]":id;}).join(" · ");
+    f.appendChild(H("div",{class:"printsources",html:"<b>Kaynaklar:</b> "+esc(t)}));
+  });
+  document.getElementById("stage").addEventListener("click",e=>{
+    if(!e.target.closest(".pick")&&!e.target.closest(".inspect"))
+      slides[cur].querySelectorAll(".inspect").forEach(x=>x.remove());
+  });
+  scaleStage(); show(0);
+}
+init();
+
+</script>
+</body>
+</html>
