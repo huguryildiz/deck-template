@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deck template</title>
-<meta name="description" content="A self-contained, offline-capable interactive presentation template with cards, tables, equations, evidence labels, animations, and source panels.">
+<title>Şablon sunum</title>
+<meta name="description" content="Tek dosyalık, çevrimdışı çalışan etkileşimli sunum şablonu. Kart, tablo, denklem, kanıt etiketi, canlandırma ve kaynak paneli bileşenlerini içerir.">
 <style>
 :root{
   --primary:#cc785c; --primary-active:#a9583e; --primary-disabled:#e6dfd8;
@@ -282,23 +282,23 @@ body.reduced .rm-note{display:block}
 <body>
 
 <!--
-  DECK TEMPLATE · how to use
+  ŞABLON SUNUM · nasıl kullanılır
 
-  1. Copy this file and change the <title> and <meta description> fields.
-  2. Each slide is a <section class="slide"> element with these attributes:
-       id            unique; also used as a DETAILS key
-       data-title    short name shown in the top bar
-       data-sources  space-separated SRC keys (source panel and print footer)
-       data-anim     ANIMS key when the slide has an animation
-  3. Slide body: .eyebrow, h2, .deck-lead, .slide-body, .foot, in that order.
-  4. Data and content are collected in four blocks near the start of the script: SRC, DETAILS, ANIMS, title visual.
-  5. The design canvas is fixed at 1280 x 720 pixels and scaled to the viewport. A slide must fit within this box;
-     overflowing content is clipped in print. Check the fit in the browser console with:
+  1. Bu dosyayı kopyalayın, <title> ve <meta description> alanlarını değiştirin.
+  2. Her slayt bir <section class="slide"> öğesidir ve şu öznitelikleri taşır:
+       id            benzersiz, DETAILS anahtarı olarak da kullanılır
+       data-title    üst çubukta görünen kısa ad
+       data-sources  boşlukla ayrılmış SRC anahtarları (Kaynaklar paneli ve baskı altbilgisi)
+       data-anim     slaytta canlandırma varsa ANIMS anahtarı
+  3. Slayt gövdesi: .eyebrow, h2, .deck-lead, .slide-body, .foot sırasıyla.
+  4. Veri ve içerik betiğin başındaki dört blokta toplanır: SRC, DETAILS, ANIMS, başlık görseli.
+  5. Tasarım tuvali sabit 1280 x 720 pikseldir ve ekrana ölçeklenir. Bir slayt bu kutuya sığmalıdır;
+     sığmazsa baskıda kırpılır. Sığıp sığmadığını tarayıcı konsolunda şöyle kontrol edebilirsiniz:
        [...document.querySelectorAll("#stage .slide")].map((s,i)=>{const h=s.hidden;s.hidden=false;
          const r=s.scrollHeight>s.clientHeight+1;s.hidden=h;return r?i+1:null}).filter(Boolean)
-  6. The file is self-contained: no CDN, remote font, analytics, or runtime request.
-     Preserve this rule so the presentation can open offline.
-  7. Keyboard: arrow keys, PageUp, PageDown, Home, End, s (sources), d (details).
+  6. Dosya tek parçadır: CDN, uzak font, analitik veya çalışma zamanı isteği yoktur.
+     Bu kuralı bozmayın; sunum internetsiz açılabilmelidir.
+  7. Klavye: ok tuşları, PageUp, PageDown, Home, End, s (kaynaklar), d (ayrıntı).
 -->
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -330,20 +330,20 @@ body.reduced .rm-note{display:block}
 </defs></svg>
 
 <header id="bar">
-  <span class="wordmark"><span class="spike" aria-hidden="true"></span>Deck name</span>
-  <span class="deckname" id="deckname">What problem can we study in quantum networks?</span>
+  <span class="wordmark"><span class="spike" aria-hidden="true"></span>Sunum adı</span>
+  <span class="deckname" id="deckname">Kuantum ağlarında hangi problemi çalışabiliriz?</span>
   <span class="grow"></span>
   <span class="group">
-    <button class="btn" id="btn-sources" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-book"/></svg>Sources</button>
-    <button class="btn" id="btn-details" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-sliders"/></svg>Details</button>
-    <button class="btn" id="btn-index" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-index"/></svg>Source index</button>
+    <button class="btn" id="btn-sources" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-book"/></svg>Kaynaklar</button>
+    <button class="btn" id="btn-details" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-sliders"/></svg>Ayrıntı</button>
+    <button class="btn" id="btn-index" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-index"/></svg>Kaynak dizini</button>
   </span>
   <span class="sep" style="width:1px;height:24px;background:var(--hairline)"></span>
   <span class="group">
-    <button class="btn btn-sq" id="btn-full" aria-label="Full screen"><svg aria-hidden="true"><use href="#i-expand"/></svg></button>
-    <button class="btn btn-sq" id="btn-print" aria-label="Export to PDF"><svg aria-hidden="true"><use href="#i-print"/></svg></button>
-    <button class="btn btn-sq" id="btn-prev" aria-label="Previous slide"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
-    <button class="btn btn-sq" id="btn-next" aria-label="Next slide"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
+    <button class="btn btn-sq" id="btn-full" aria-label="Tam ekran"><svg aria-hidden="true"><use href="#i-expand"/></svg></button>
+    <button class="btn btn-sq" id="btn-print" aria-label="PDF'e aktar"><svg aria-hidden="true"><use href="#i-print"/></svg></button>
+    <button class="btn btn-sq" id="btn-prev" aria-label="Önceki slayt"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+    <button class="btn btn-sq" id="btn-next" aria-label="Sonraki slayt"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
     <span id="counter" aria-live="polite">1 / 23</span>
   </span>
 </header>
@@ -352,68 +352,68 @@ body.reduced .rm-note{display:block}
 <main id="deck">
 <div id="stage">
 
-<!-- ══════════ 1 · title slide ══════════
-     data-title  : short name shown in the top bar and print footer
-     data-sources: source keys used on this slide (keys in the SRC object)
-     data-anim   : ANIMS key when the slide has an animation                  -->
-<section class="slide" id="s1" data-title="Presentation title" data-sources="ornek-kaynak ornek-depo">
+<!-- ══════════ 1 · başlık slaydı ══════════
+     data-title  : üst çubukta ve baskı altbilgisinde görünen kısa ad
+     data-sources: bu slaytta kullanılan kaynak anahtarları (SRC nesnesindeki anahtarlar)
+     data-anim   : slaytta canlandırma varsa ANIMS anahtarı                        -->
+<section class="slide" id="s1" data-title="Sunum başlığı" data-sources="ornek-kaynak ornek-depo">
   <div class="slide-body" style="justify-content:center">
     <div class="grid" style="grid-template-columns:1.12fr .88fr;gap:36px;align-items:center">
       <div>
-        <p class="eyebrow">Subtitle, Month Year</p>
-        <h2 style="font-size:52px;line-height:1.05;letter-spacing:-1.2px;margin-bottom:18px">The main question of the presentation</h2>
-        <p style="font-family:var(--serif);font-size:25px;color:var(--body-strong);margin:0 0 20px">Name Surname and Name Surname</p>
-        <p class="deck-lead" style="max-width:520px">One-sentence frame: what we have, what this presentation shows, and which question will be discussed at the end.</p>
+        <p class="eyebrow">Alt başlık, Ay Yıl</p>
+        <h2 style="font-size:52px;line-height:1.05;letter-spacing:-1.2px;margin-bottom:18px">Sunumun ana sorusu buraya</h2>
+        <p style="font-family:var(--serif);font-size:25px;color:var(--body-strong);margin:0 0 20px">Ad Soyad ve Ad Soyad</p>
+        <p class="deck-lead" style="max-width:520px">Tek cümlelik çerçeve: elimizde ne var, bu sunum neyi gösteriyor, sonunda hangi soru tartışılacak.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>Status label</span>
-          <span class="ev ev-open"><svg aria-hidden="true"><use href="#i-q"/></svg>Open-question label</span>
+          <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>Durum etiketi</span>
+          <span class="ev ev-open"><svg aria-hidden="true"><use href="#i-q"/></svg>Açık soru etiketi</span>
         </div>
       </div>
       <div class="anim-stage" style="height:420px;background:var(--surface-dark)" id="titlefig-host"></div>
     </div>
   </div>
   <div class="foot">
-    <span class="note">Footer: describe what the visual shows in one sentence. The source list is added below this line in print.</span>
+    <span class="note">Altbilgi: görselin ne gösterdiğini bir cümleyle söyleyin. Baskıda bu satırın altına kaynak listesi eklenir.</span>
   </div>
 </section>
 
-<!-- ══════════ 2 · component templates ══════════ -->
-<section class="slide" id="s2" data-title="Component templates" data-sources="ornek-kaynak">
-  <p class="eyebrow">Template page</p>
-  <h2>Which components are ready?</h2>
-  <p class="deck-lead">This slide shows reusable components: cards, evidence labels, key-value rows, a table, an equation box, and a definition list.</p>
+<!-- ══════════ 2 · bileşen şablonları ══════════ -->
+<section class="slide" id="s2" data-title="Bileşen şablonları" data-sources="ornek-kaynak">
+  <p class="eyebrow">Şablon sayfası</p>
+  <h2>Hangi bileşenler hazır?</h2>
+  <p class="deck-lead">Bu slayt kopyalanabilir bileşenleri gösterir: kartlar, kanıt etiketleri, anahtar-değer satırları, tablo, denklem kutusu ve tanım listesi.</p>
   <div class="slide-body">
     <div class="grid g3" style="flex:none">
       <div class="card">
-        <h3><span class="k">card</span>Standard card</h3>
-        <p>Body text. Card <span class="mono">.card</span>, label <span class="mono">.k</span>, body <span class="mono">p</span>.</p>
+        <h3><span class="k">card</span>Standart kart</h3>
+        <p>Gövde metni. Kart <span class="mono">.card</span>, üst etiket <span class="mono">.k</span>, gövde <span class="mono">p</span>.</p>
         <div class="rows">
-          <div class="r"><span class="k">Key</span><span class="v">value</span></div>
-          <div class="r"><span class="k">Second key</span><span class="v">12 / 34</span></div>
+          <div class="r"><span class="k">Anahtar</span><span class="v">değer</span></div>
+          <div class="r"><span class="k">İkinci anahtar</span><span class="v">12 / 34</span></div>
         </div>
       </div>
       <div class="card plain">
-        <h3><span class="k">card plain</span>Outlined card</h3>
-        <p>Light background with a thin border. Works well beside an equation or figure.</p>
+        <h3><span class="k">card plain</span>Çerçeveli kart</h3>
+        <p>Açık zeminli, ince çerçeveli kart. Denklem ve şekil yanına iyi oturur.</p>
         <dl class="dl">
-          <dt>A1</dt><dd>definition-list row, short description</dd>
-          <dt>A2</dt><dd>second row</dd>
+          <dt>A1</dt><dd>tanım listesi satırı, kısa açıklama</dd>
+          <dt>A2</dt><dd>ikinci satır</dd>
         </dl>
       </div>
       <div class="card dark">
-        <h3><span class="k">card dark</span>Emphasis card</h3>
-        <p>Use a dark card at most once per slide, for a result or warning.</p>
+        <h3><span class="k">card dark</span>Vurgu kartı</h3>
+        <p>Koyu kart, slaytta en çok bir kez kullanılır. Sonuç veya uyarı için.</p>
       </div>
     </div>
 
     <div class="grid" style="grid-template-columns:1.15fr .85fr;flex:1;min-height:0">
       <div class="tblwrap plain" style="align-self:start">
         <table class="t zebra">
-          <thead><tr><th style="width:26%">Column</th><th style="width:22%">Evidence type</th><th>Description</th></tr></thead>
+          <thead><tr><th style="width:26%">Sütun</th><th style="width:22%">Kanıt türü</th><th>Açıklama</th></tr></thead>
           <tbody>
-            <tr><td><strong>First row</strong></td><td><span class="ev ev-fact">fact</span></td><td>Short description text.</td></tr>
-            <tr><td><strong>Second row</strong></td><td><span class="ev ev-author">claim</span></td><td>Short description text.</td></tr>
-            <tr><td><strong>Third row</strong></td><td><span class="ev ev-synth">synthetic</span></td><td>Short description text.</td></tr>
+            <tr><td><strong>Birinci satır</strong></td><td><span class="ev ev-fact">olgu</span></td><td>Kısa açıklama metni.</td></tr>
+            <tr><td><strong>İkinci satır</strong></td><td><span class="ev ev-author">beyan</span></td><td>Kısa açıklama metni.</td></tr>
+            <tr><td><strong>Üçüncü satır</strong></td><td><span class="ev ev-synth">sentetik</span></td><td>Kısa açıklama metni.</td></tr>
           </tbody>
         </table>
       </div>
@@ -422,45 +422,45 @@ body.reduced .rm-note{display:block}
           <div class="mth" style="font-size:18px">
             <i>x</i><sub><i>t</i>+1</sub> = <i>A</i> <i>h<sub>t</sub></i> +
             <span class="bigop"><span class="lim"></span><span class="sym">&sum;</span><span class="lim"><i>e</i></span></span>
-            &Gamma;<sub><i>e</i></sub> <i>g</i><sub><i>e</i>,<i>t</i></sub><span class="tag">Equation label</span></div>
-          <p class="symkey"><b>x</b> state, <b>h</b> held, <b>g</b> generation. For inline mathematics use <span class="mono">.mi</span>: <span class="mi"><i>p</i><sub>sw</sub> &ge; 0</span>.</p>
+            &Gamma;<sub><i>e</i></sub> <i>g</i><sub><i>e</i>,<i>t</i></sub><span class="tag">Denklem etiketi</span></div>
+          <p class="symkey"><b>x</b> durum, <b>h</b> tutulan, <b>g</b> üretim. Satır içi matematik için <span class="mono">.mi</span>: <span class="mi"><i>p</i><sub>sw</sub> &ge; 0</span>.</p>
         </div>
         <div class="card tight" style="flex:1">
-          <h3>Evidence labels</h3>
+          <h3>Kanıt etiketleri</h3>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <span class="ev ev-fact"><svg aria-hidden="true"><use href="#i-check"/></svg>fact</span>
-            <span class="ev ev-author"><svg aria-hidden="true"><use href="#i-quote"/></svg>author claim</span>
-            <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>repository result</span>
-            <span class="ev ev-synth"><svg aria-hidden="true"><use href="#i-flask"/></svg>synthetic</span>
-            <span class="ev ev-infer"><svg aria-hidden="true"><use href="#i-branch"/></svg>inference</span>
-            <span class="ev ev-prop"><svg aria-hidden="true"><use href="#i-compass"/></svg>proposal</span>
-            <span class="ev ev-open"><svg aria-hidden="true"><use href="#i-q"/></svg>open question</span>
+            <span class="ev ev-fact"><svg aria-hidden="true"><use href="#i-check"/></svg>olgu</span>
+            <span class="ev ev-author"><svg aria-hidden="true"><use href="#i-quote"/></svg>yazar beyanı</span>
+            <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>depo sonucu</span>
+            <span class="ev ev-synth"><svg aria-hidden="true"><use href="#i-flask"/></svg>sentetik</span>
+            <span class="ev ev-infer"><svg aria-hidden="true"><use href="#i-branch"/></svg>çıkarım</span>
+            <span class="ev ev-prop"><svg aria-hidden="true"><use href="#i-compass"/></svg>öneri</span>
+            <span class="ev ev-open"><svg aria-hidden="true"><use href="#i-q"/></svg>açık soru</span>
           </div>
-          <p style="font-size:13px;color:var(--muted);margin-top:auto">Each label is distinguished by shape as well as color: the border may be solid, dashed, or dotted.</p>
+          <p style="font-size:13px;color:var(--muted);margin-top:auto">Her etiket renkten bağımsız olarak biçimle de ayrışır: kenarlık düz, kesikli veya noktalı.</p>
         </div>
       </div>
     </div>
   </div>
   <div class="foot">
-    <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>Example label</span>
-    <span class="note">Footer note: state the slide's boundary or warning here.</span>
+    <span class="ev ev-repo"><svg aria-hidden="true"><use href="#i-db"/></svg>Örnek etiket</span>
+    <span class="note">Altbilgi notu: slaytın sınırını veya uyarısını buraya yazın.</span>
   </div>
 </section>
 
-<!-- ══════════ 3 · animation template ══════════ -->
-<section class="slide" id="s3" data-title="Animation template" data-sources="ornek-depo" data-anim="demo">
-  <p class="eyebrow">Step-by-step explanation</p>
-  <h2>How is an animation built?</h2>
+<!-- ══════════ 3 · canlandırma şablonu ══════════ -->
+<section class="slide" id="s3" data-title="Canlandırma şablonu" data-sources="ornek-depo" data-anim="demo">
+  <p class="eyebrow">Adım adım anlatım</p>
+  <h2>Canlandırma nasıl kurulur?</h2>
   <div class="anim">
     <div class="controls" data-controls="demo"></div>
     <div class="anim-stage" data-stage="demo"></div>
     <div class="log" data-log="demo"></div>
-    <div class="rm-note">Reduced motion is on. The animation does not autoplay; all steps are listed above.</div>
+    <div class="rm-note">Hareket azaltma açık. Canlandırma kendiliğinden oynamaz; adımların tamamı yukarıda listeleniyor.</div>
     <div class="storyboard printonly" data-storyboard="demo"></div>
   </div>
   <div class="foot">
-    <span class="ev ev-synth"><svg aria-hidden="true"><use href="#i-flask"/></svg>Example data</span>
-    <span class="note">The animation starts paused. In print it becomes a three-frame storyboard: initial state, intermediate decision, final state.</span>
+    <span class="ev ev-synth"><svg aria-hidden="true"><use href="#i-flask"/></svg>Örnek veri</span>
+    <span class="note">Canlandırma duraklamış başlar. Baskıda üç kareli storyboard'a dönüşür: başlangıç, ara karar, son durum.</span>
   </div>
 </section>
 
@@ -470,29 +470,29 @@ body.reduced .rm-note{display:block}
 <section id="srcindex-print"></section>
 
 <dialog id="dlg-sources" aria-labelledby="dlg-sources-t">
-  <div class="dhead"><h3 id="dlg-sources-t">Sources</h3><span class="sub" id="dlg-sources-sub"></span>
-    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dhead"><h3 id="dlg-sources-t">Kaynaklar</h3><span class="sub" id="dlg-sources-sub"></span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
   <div class="dbody" id="dlg-sources-body"></div>
 </dialog>
 <dialog id="dlg-details" aria-labelledby="dlg-details-t">
-  <div class="dhead"><h3 id="dlg-details-t">Details</h3><span class="sub" id="dlg-details-sub"></span>
-    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dhead"><h3 id="dlg-details-t">Ayrıntı</h3><span class="sub" id="dlg-details-sub"></span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
   <div class="dbody" id="dlg-details-body"></div>
 </dialog>
 <dialog id="dlg-index" aria-labelledby="dlg-index-t">
-  <div class="dhead"><h3 id="dlg-index-t">Source index</h3><span class="sub">All sources and evidence classes used in this presentation</span>
-    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dhead"><h3 id="dlg-index-t">Kaynak dizini</h3><span class="sub">Bu sunumda kullanılan bütün kaynaklar ve kanıt sınıfları</span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
   <div class="dbody" id="dlg-index-body"></div>
 </dialog>
 <dialog id="dlg-lit" aria-labelledby="dlg-lit-t">
-  <div class="dhead"><h3 id="dlg-lit-t">Category</h3><span class="sub" id="dlg-lit-sub"></span>
-    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dhead"><h3 id="dlg-lit-t">Kategori</h3><span class="sub" id="dlg-lit-sub"></span>
+    <button class="btn btn-sq" style="margin-left:auto" data-close aria-label="Kapat"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
   <div class="dbody" id="dlg-lit-body"></div>
 </dialog>
 
 <script>
 "use strict";
-/* ─────────── helpers ─────────── */
+/* ─────────── yardımcılar ─────────── */
 const NS="http://www.w3.org/2000/svg";
 function E(tag,at,kids){const n=document.createElementNS(NS,tag);
   if(at)for(const k in at){if(at[k]===null||at[k]===undefined)continue;n.setAttribute(k,at[k]);}
@@ -508,7 +508,7 @@ const C={ink:"#141413",body:"#3d3d3a",muted:"#6c6a64",soft:"#8e8b82",hair:"#e6df
   canvas:"#faf9f5",dark:"#181715",darkEl:"#252320",coral:"#cc785c",coralD:"#a9583e",teal:"#5db8a6",
   tealD:"#2d7d6c",amber:"#e8a55a",amberD:"#a06a1e",onDark:"#faf9f5",onDarkSoft:"#a09d96"};
 
-/* state icons: shape distinguishes labels in addition to color */
+/* durum simgeleri: renk tek kodlama değil, biçim de ayırt eder */
 function markOk(x,y,r,col){const g=E("g",{});g.appendChild(E("circle",{cx:x,cy:y,r:r,fill:col}));
   g.appendChild(E("path",{d:`M${x-r*.5} ${y} l${r*.35} ${r*.4} l${r*.7} -${r*.85}`,fill:"none",stroke:"#fff","stroke-width":r*.28,"stroke-linecap":"round","stroke-linejoin":"round"}));return g;}
 function markNo(x,y,r,col){const g=E("g",{});g.appendChild(E("circle",{cx:x,cy:y,r:r,fill:"none",stroke:col,"stroke-width":r*.3}));
@@ -531,64 +531,64 @@ function svgMath(x,y,parts,at){
 function txt(x,y,s,at){return E("text",Object.assign({x:x,y:y,"text-anchor":"middle","dominant-baseline":"middle",
   "font-family":"system-ui,-apple-system,sans-serif","font-size":13,fill:C.body},at||{}),String(s));}
 
-const EVLABEL={fact:"Source-verified fact",author:"Source author's claim",repo:"Verified repository result",
-  synth:"Limited synthetic result",infer:"Reasonable inference",prop:"Proposed research direction",open:"Unresolved question"};
+const EVLABEL={fact:"Kaynak doğrulanmış olgu",author:"Kaynak yazarının beyanı",repo:"Doğrulanmış depo sonucu",
+  synth:"Sınırlı sentetik sonuç",infer:"Makul çıkarım",prop:"Önerilen araştırma yönü",open:"Çözülmemiş soru"};
 const EVICON={fact:"i-check",author:"i-quote",repo:"i-db",synth:"i-flask",infer:"i-branch",prop:"i-compass",open:"i-q"};
 function reduced(){return window.matchMedia("(prefers-reduced-motion: reduce)").matches;}
 const RUN={};
 
 /* ═══════════ 1. KAYNAK KAYITLARI ═══════════
-   These keys appear in the data-sources attribute of slides.
-   The ev field gives the evidence class: fact | author | repo | synth | infer | prop | open
-   The group field determines the heading in the source index.                 */
+   Her slaytın data-sources özniteliğinde bu anahtarlar geçer.
+   ev alanı kanıt sınıfını verir: fact | author | repo | synth | infer | prop | open
+   group alanı kaynak dizinindeki başlığı belirler.                              */
 const SRC={
-"ornek-kaynak":{t:"Example paper title",sid:"author2026shorttitle",group:"Primary sources",
+"ornek-kaynak":{t:"Örnek makale başlığı",sid:"yazar2026kisabaslik",group:"Birincil kaynaklar",
   ref:"pdfs/main/ornek.pdf",url:"https://arxiv.org/abs/0000.00000",
-  ver:"Reviewed version: arXiv v1",loc:"p. 3, Eq. (5)-(7)",ev:"fact",
-  lim:"State what has not been verified here. Do not leave this blank."},
-"ornek-depo":{t:"Example repository record",sid:null,group:"Repository records",
+  ver:"İncelenen sürüm: arXiv v1",loc:"s. 3, Eq. (5)-(7)",ev:"fact",
+  lim:"Neyin doğrulanmadığını buraya yazın. Boş bırakmayın."},
+"ornek-depo":{t:"Örnek depo kaydı",sid:null,group:"Depo kayıtları",
   ref:"docs/ornek.md",url:null,
-  ver:"1 January 2026",loc:"Section 2",ev:"repo",
-  lim:"Valid only in a limited setting. It does not establish a general result."}
+  ver:"1 Ocak 2026",loc:"Bölüm 2",ev:"repo",
+  lim:"Sınırlı bir alanda geçerli. Genel bir sonuç kurmaz."}
 };
 
-/* ═══════════ 2. DETAIL PANELS ═══════════
-   The key is the slide id. Put full equations, long tables, and solver fields here. */
+/* ═══════════ 2. AYRINTI PANELLERİ ═══════════
+   Anahtar slaytın id'sidir. Tam denklemler, uzun tablolar ve çözücü alanları buraya.  */
 const DETAILS={
- s2:{t:"Complete component-template list",h:`
-  <h4>Layout</h4>
-  <p>Grid classes: <span class="mono">.grid.g2</span>, <span class="mono">.g3</span>, <span class="mono">.g4</span>,
-  <span class="mono">.eq-split</span>. The design canvas is fixed at 1280 &times; 720 pixels; overflowing content is clipped in print.</p>
-  <h4>Density presets</h4>
+ s2:{t:"Bileşen şablonlarının tam listesi",h:`
+  <h4>Yerleşim</h4>
+  <p>Izgara sınıfları: <span class="mono">.grid.g2</span>, <span class="mono">.g3</span>, <span class="mono">.g4</span>,
+  <span class="mono">.eq-split</span>. Tasarım tuvali sabit 1280 &times; 720 pikseldir; içerik taşarsa baskıda kırpılır.</p>
+  <h4>Yoğunluk ön ayarları</h4>
   <ul>
-   <li><span class="mono">.card.tight</span> uses smaller padding and type.</li>
-   <li><span class="mono">table.t.s3t</span>, <span class="mono">.s20t</span>, and <span class="mono">.rankt</span> are compact table variants.</li>
+   <li><span class="mono">.card.tight</span> daha küçük iç boşluk ve punto.</li>
+   <li><span class="mono">table.t.s3t</span>, <span class="mono">.s20t</span>, <span class="mono">.rankt</span> sıkışık tablo varyantları.</li>
   </ul>
-  <h4>Mathematics</h4>
-  <p>Block equations use <span class="mono">.eqbox &gt; .mth</span>, inline mathematics uses <span class="mono">.mi</span>,
-  and SVG mathematics uses <span class="mono">svgMath(x,y,parts)</span>. Variables are italic; labels are upright.</p>`},
- s3:{t:"Shape of the animation definition",h:`
-  <h4>ANIMS record</h4>
-  <p>Each animation carries a <span class="mono">frames</span> array, a pure <span class="mono">render(host,i,print)</span>
-  function, <span class="mono">log(i)</span>, and a <span class="mono">mid</span> field for the middle frame of the print storyboard.</p>
-  <h4>Rules</h4>
+  <h4>Matematik</h4>
+  <p>Blok denklem <span class="mono">.eqbox &gt; .mth</span>, satır içi <span class="mono">.mi</span>,
+  SVG içinde <span class="mono">svgMath(x,y,parts)</span>. Değişkenler italik, etiketler dik yazılır.</p>`},
+ s3:{t:"Canlandırma tanımının şekli",h:`
+  <h4>ANIMS kaydı</h4>
+  <p>Her canlandırma <span class="mono">frames</span> dizisi, saf bir <span class="mono">render(host,i,print)</span>
+  fonksiyonu, <span class="mono">log(i)</span> ve baskı storyboard'unun orta karesi için <span class="mono">mid</span> alanı taşır.</p>
+  <h4>Kurallar</h4>
   <ul>
-   <li>The same render function is used in the live view and the print storyboard.</li>
-   <li>The animation starts paused and resets when the slide changes.</li>
-   <li>With reduced motion enabled, autoplay is disabled and all steps are shown as a list.</li>
+   <li>Aynı render fonksiyonu hem canlı görünümde hem baskı storyboard'unda kullanılır.</li>
+   <li>Canlandırma duraklamış başlar; slayt değişince başa döner.</li>
+   <li>Hareket azaltma açıkken otomatik oynatma yapılmaz, bütün adımlar liste olarak gösterilir.</li>
   </ul>`}
 };
 
 /* ═══════════ 3. CANLANDIRMALAR ═══════════ */
 const DEMO_FRAMES=[
- {sel:-1,note:"Initial state: no node is selected."},
- {sel:0, note:"The first node is selected."},
- {sel:1, note:"The decision moves to the second node."},
- {sel:2, note:"Final state: the third node is selected."}
+ {sel:-1,note:"Başlangıç: hiçbir düğüm seçili değil."},
+ {sel:0, note:"Birinci düğüm seçildi."},
+ {sel:1, note:"Karar ikinci düğüme taşındı."},
+ {sel:2, note:"Son durum: üçüncü düğüm seçili."}
 ];
 function demoRender(host,i,print){
   const f=DEMO_FRAMES[i];
-  const s=mk("0 0 720 260","Example animation frame with three boxes.");
+  const s=mk("0 0 720 260","Üç kutulu örnek canlandırma karesi.");
   const xs=[110,340,570];
   xs.forEach((x,k)=>{
     if(k<2)s.appendChild(E("line",{x1:x+62,y1:120,x2:xs[k+1]-62,y2:120,
@@ -598,21 +598,21 @@ function demoRender(host,i,print){
     const on=(k===f.sel);
     s.appendChild(E("rect",{x:x-62,y:88,width:124,height:64,rx:12,
       fill:on?C.coral:C.canvas,stroke:on?C.coralD:C.hair,"stroke-width":on?2:1.4}));
-    s.appendChild(txt(x,112,"Step "+(k+1),{"font-size":14,"font-weight":600,fill:on?"#fff":C.ink}));
-    s.appendChild(txt(x,132,"state "+k,{"font-size":12,fill:on?"rgba(255,255,255,.86)":C.muted}));
+    s.appendChild(txt(x,112,"Adım "+(k+1),{"font-size":14,"font-weight":600,fill:on?"#fff":C.ink}));
+    s.appendChild(txt(x,132,"durum "+k,{"font-size":12,fill:on?"rgba(255,255,255,.86)":C.muted}));
   });
-  s.appendChild(svgMath(360,206,["selected node: ",["k","",null,"t"],f.sel<0?" none":" = "+f.sel],
+  s.appendChild(svgMath(360,206,["seçili düğüm: ",["k","",null,"t"],f.sel<0?" yok":" = "+f.sel],
     {"font-size":14,fill:C.muted,"text-anchor":"middle",prose:true}));
   host.appendChild(s);
 }
 const ANIMS={
  demo:{frames:DEMO_FRAMES,mid:1,dark:false,render:demoRender,
-   log:i=>({clock:"step "+(i+1),text:DEMO_FRAMES[i].note})}
+   log:i=>({clock:"adım "+(i+1),text:DEMO_FRAMES[i].note})}
 };
 
-/* ═══════════ 4. TITLE VISUAL ═══════════ */
+/* ═══════════ 4. BAŞLIK GÖRSELİ ═══════════ */
 function titleFigure(host){
-  const s=mk("0 0 460 420","Example title visual: a three-node chain and a general graph.");
+  const s=mk("0 0 460 420","Örnek başlık görseli: üç düğümlü zincir ve genel graf.");
   const nodes=[[80,120],[230,80],[380,120],[150,260],[310,260],[230,350]];
   const edges=[[0,1],[1,2],[0,3],[3,4],[4,2],[3,5],[5,4]];
   edges.forEach(([a,b])=>s.appendChild(E("line",{x1:nodes[a][0],y1:nodes[a][1],x2:nodes[b][0],y2:nodes[b][1],
@@ -625,11 +625,11 @@ function titleFigure(host){
       stroke:end?"none":C.onDarkSoft,"stroke-width":1}));
   });
   s.appendChild(E("text",{x:26,y:400,"font-family":"system-ui,sans-serif","font-size":12,fill:C.onDarkSoft},
-    "Visual description goes here."));
+    "Görsel açıklaması buraya."));
   host.appendChild(s);
 }
 
-/* ─────────── animation engine ─────────── */
+/* ─────────── canlandırma motoru ─────────── */
 function buildAnim(key){
   const def=ANIMS[key];
   const stage=document.querySelector('[data-stage="'+key+'"]');
@@ -641,12 +641,12 @@ function buildAnim(key){
   RUN[key]=st;
   const b=(id,icon,label,cls)=>{const n=H("button",{class:"btn"+(cls?" "+cls:""),type:"button"});
     n.innerHTML='<svg aria-hidden="true"><use href="#i-'+icon+'"/></svg>'+label;n.dataset.act=id;return n;};
-  const bPlay=b("play","play","Play","btn-primary"), bPause=b("pause","pause","Pause"),
-        bStep=b("step","step","Step"), bRestart=b("restart","restart","Restart");
+  const bPlay=b("play","play","Oynat","btn-primary"), bPause=b("pause","pause","Duraklat"),
+        bStep=b("step","step","Adım"), bRestart=b("restart","restart","Baştan");
   ctr.append(bPlay,bPause,bStep,bRestart);
   ctr.appendChild(H("span",{class:"sep"}));
-  ctr.appendChild(H("span",{class:"lbl"},"Speed"));
-  const sp=H("div",{class:"speed",role:"group","aria-label":"Animation speed"});
+  ctr.appendChild(H("span",{class:"lbl"},"Hız"));
+  const sp=H("div",{class:"speed",role:"group","aria-label":"Canlandırma hızı"});
   [[0.5,"0,5×"],[1,"1×"],[2,"2×"]].forEach(([v,l])=>{
     const n=H("button",{type:"button","aria-pressed":v===1?"true":"false"},l);
     n.addEventListener("click",()=>{st.speed=v;sp.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));
@@ -662,7 +662,7 @@ function buildAnim(key){
     const L=def.log(st.i);
     logEl.innerHTML="";
     if(reduced()){
-      logEl.appendChild(H("span",{class:"tclock"},"ALL STEPS"));
+      logEl.appendChild(H("span",{class:"tclock"},"TÜM ADIMLAR"));
       const ol=H("ol",{});
       def.frames.forEach((f,k)=>{const li=H("li",{style:k===st.i?"color:var(--ink);font-weight:600":""},
         def.log(k).clock+": "+def.log(k).text);ol.appendChild(li);});
@@ -671,7 +671,7 @@ function buildAnim(key){
       logEl.appendChild(H("span",{class:"tclock"},L.clock));
       logEl.appendChild(H("span",{},L.text));
     }
-    pos.textContent="Step "+(st.i+1)+" / "+N;
+    pos.textContent="Adım "+(st.i+1)+" / "+N;
     bPlay.disabled=!!st.timer||st.i>=N-1;
     bPause.disabled=!st.timer;
     bStep.disabled=st.i>=N-1;
@@ -684,9 +684,9 @@ function buildAnim(key){
   bRestart.addEventListener("click",()=>{stop();st.i=0;draw();});
   st.reset=()=>{stop();st.i=0;draw();};
   st.stop=stop;
-  /* three-frame storyboard for print */
+  /* baskı için üç kareli storyboard */
   const idx=[0,def.mid,N-1];
-  const caps=["initial state","intermediate decision","final state"];
+  const caps=["başlangıç durumu","ara karar","son durum"];
   idx.forEach((k,q)=>{
     const fig=H("figure",{class:def.dark?"dark":""});
     const boxEl=H("div",{class:"sbox"});
@@ -698,35 +698,35 @@ function buildAnim(key){
   draw();
 }
 
-/* ─────────── detail panels ─────────── */
+/* ─────────── ayrıntı panelleri ─────────── */
 
-/* ─────────── source and detail panels ─────────── */
+/* ─────────── kaynak ve ayrıntı panelleri ─────────── */
 function srcCard(id){
   const s=SRC[id];if(!s)return null;
   const d=H("div",{class:"srcitem"});
   d.appendChild(H("div",{class:"st"},s.t));
   if(s.sid)d.appendChild(H("div",{class:"sid"},"study_id: "+s.sid));
   const bits=[];
-  bits.push("<b>Location:</b> "+esc(s.ref));
-  if(s.url)bits.push('<b>Link:</b> <a href="'+esc(s.url)+'" target="_blank" rel="noreferrer">'+esc(s.url)+"</a>");
-  bits.push("<b>Reviewed version:</b> "+esc(s.ver));
-  bits.push("<b>Reviewed location:</b> "+s.loc);
+  bits.push("<b>Konum:</b> "+esc(s.ref));
+  if(s.url)bits.push('<b>Bağlantı:</b> <a href="'+esc(s.url)+'" target="_blank" rel="noreferrer">'+esc(s.url)+"</a>");
+  bits.push("<b>İncelenen sürüm:</b> "+esc(s.ver));
+  bits.push("<b>İncelenen yer:</b> "+s.loc);
   d.appendChild(H("div",{class:"sm",html:bits.join("<br>")}));
   const ch=H("div",{class:"chips"});
   const c=H("span",{class:"ev ev-"+s.ev});
   c.innerHTML='<svg aria-hidden="true"><use href="#'+EVICON[s.ev]+'"/></svg>'+EVLABEL[s.ev];
   ch.appendChild(c); d.appendChild(ch);
-  d.appendChild(H("div",{class:"slim",html:"<b>Boundary:</b> "+s.lim}));
+  d.appendChild(H("div",{class:"slim",html:"<b>Sınır:</b> "+s.lim}));
   return d;
 }
 function openSources(slide){
   const ids=(slide.dataset.sources||"").split(/\s+/).filter(Boolean);
-  document.getElementById("dlg-sources-sub").textContent=slide.dataset.title+" · "+ids.length+" sources";
+  document.getElementById("dlg-sources-sub").textContent=slide.dataset.title+" · "+ids.length+" kaynak";
   const b=document.getElementById("dlg-sources-body");b.innerHTML="";
-  if(!ids.length)b.appendChild(H("p",{},"There is no separate source record for this slide."));
+  if(!ids.length)b.appendChild(H("p",{},"Bu slayt için ayrı bir kaynak kaydı yok."));
   ids.forEach(id=>{const c=srcCard(id);if(c)b.appendChild(c);});
   b.appendChild(H("p",{style:"color:var(--muted);font-size:13.5px;margin-top:16px"},
-    "Repository prose, retrieved text, RAG output, and model reviews do not replace an original paper, equation, receipt, or independent check."));
+    "Depo düzyazısı, geri getirilen metin, RAG çıktısı ve model incelemeleri; özgün bir makalenin, denklemin, makbuzun veya bağımsız bir kontrolün yerini tutmaz."));
   document.getElementById("dlg-sources").showModal();
 }
 function openDetails(slide){
@@ -734,8 +734,8 @@ function openDetails(slide){
   document.getElementById("dlg-details-sub").textContent=slide.dataset.title;
   const b=document.getElementById("dlg-details-body");b.innerHTML="";
   if(d){document.getElementById("dlg-details-t").textContent=d.t;b.innerHTML=d.h;}
-  else{document.getElementById("dlg-details-t").textContent="Details";
-    b.appendChild(H("p",{},"There is no separate technical record beyond what is shown on this slide. Open the Sources panel for source records."));}
+  else{document.getElementById("dlg-details-t").textContent="Ayrıntı";
+    b.appendChild(H("p",{},"Bu slaytta gösterilenin ötesinde ayrı bir teknik döküm yok. Kaynak kayıtları için Kaynaklar panelini açın."));}
   document.getElementById("dlg-details").showModal();
 }
 
@@ -795,33 +795,33 @@ window.addEventListener("resize",scaleStage);
 window.addEventListener("beforeprint",()=>{slides.forEach(s=>{s.hidden=false;});});
 window.addEventListener("afterprint",()=>{slides.forEach((s,k)=>{s.hidden=(k!==cur);});});
 
-/* ═══════════ SOURCE INDEX ═══════════ */
+/* ═══════════ KAYNAK DİZİNİ ═══════════ */
 function buildIndex(){
   const b=document.getElementById("dlg-index-body");
   const groups={};
-  Object.keys(SRC).forEach(id=>{const g=SRC[id].group||"Other";(groups[g]=groups[g]||[]).push(id);});
+  Object.keys(SRC).forEach(id=>{const g=SRC[id].group||"Diğer";(groups[g]=groups[g]||[]).push(id);});
   b.innerHTML="";
-  b.appendChild(H("p",{},"Evidence classes: source-verified fact, source author's claim, verified repository result, "+
-    "limited synthetic result, reasonable inference, proposed research direction, unresolved question. "+
-    "External links open only when the internet is available; no presentation function depends on them."));
+  b.appendChild(H("p",{},"Kanıt sınıfları: kaynak doğrulanmış olgu, kaynak yazarının beyanı, doğrulanmış depo sonucu, "+
+    "sınırlı sentetik sonuç, makul çıkarım, önerilen araştırma yönü, çözülmemiş soru. "+
+    "Harici bağlantılar yalnızca internet varsa açılır; sunumun hiçbir işlevi onlara bağlı değil."));
   Object.keys(groups).forEach(g=>{
     b.appendChild(H("h4",{},g));
     groups[g].forEach(id=>{const c=srcCard(id);if(c)b.appendChild(c);});
   });
   const p=document.getElementById("srcindex-print");
-  p.innerHTML='<div class="slide" style="display:flex"><p class="eyebrow">Appendix</p><h2>Source index</h2><div class="slide-body scroll" id="sip"></div></div>';
+  p.innerHTML='<div class="slide" style="display:flex"><p class="eyebrow">Ek</p><h2>Kaynak dizini</h2><div class="slide-body scroll" id="sip"></div></div>';
   const host=p.querySelector("#sip");
   Object.keys(groups).forEach(g=>{
     host.appendChild(H("h3",{style:"font-size:14px;margin:10px 0 4px;color:var(--ink)"},g));
     groups[g].forEach(id=>{const x=SRC[id];
       host.appendChild(H("p",{style:"font-size:11.5px;margin:0 0 4px;line-height:1.4",
         html:"<b>"+esc(x.t)+"</b>"+(x.sid?" ("+esc(x.sid)+")":"")+" · "+esc(x.ref)+" · "+esc(x.ver)+" · "+
-             EVLABEL[x.ev]+". Boundary: "+x.lim}));
+             EVLABEL[x.ev]+". Sınır: "+x.lim}));
     });
   });
 }
 
-/* ═══════════ INITIALIZATION ═══════════ */
+/* ═══════════ BAŞLATMA ═══════════ */
 function init(){
   if(reduced())document.body.classList.add("reduced");
   titleFigure(document.getElementById("titlefig-host"));
@@ -832,7 +832,7 @@ function init(){
     if(!ids.length)return;
     const f=s.querySelector(".foot");if(!f)return;
     const t=ids.map(id=>{const x=SRC[id];return x?(x.sid?x.sid:x.t)+" ["+EVLABEL[x.ev].toLowerCase()+"]":id;}).join(" · ");
-    f.appendChild(H("div",{class:"printsources",html:"<b>Sources:</b> "+esc(t)}));
+    f.appendChild(H("div",{class:"printsources",html:"<b>Kaynaklar:</b> "+esc(t)}));
   });
   document.getElementById("stage").addEventListener("click",e=>{
     if(!e.target.closest(".pick")&&!e.target.closest(".inspect"))

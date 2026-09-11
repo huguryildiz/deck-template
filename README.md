@@ -1,19 +1,27 @@
 # Deck Template
 
-Tek dosyalık, çevrimdışı çalışan etkileşimli HTML sunum şablonu.
+A self-contained, offline-capable interactive HTML presentation template.
 
-## Özellikler
+## Versions
 
-- Klavye ve düğme tabanlı slayt gezinmesi
-- Kart, tablo, denklem, kanıt etiketi ve kaynak paneli bileşenleri
-- Etkileşimli animasyonlar ve azaltılmış hareket desteği
-- Tam ekran ve yazdırarak PDF'e aktarma desteği
-- Harici bağımlılık olmadan çalışabilen statik yapı
+- [`deck-template-TR.html`](deck-template-TR.html): Turkish version
+- [`deck-template-EN.html`](deck-template-EN.html): English version
+- [`index.html`](index.html): English version used as the Vercel entry point
 
-## Kullanım
+Live English deployment: [deck-template-claude.vercel.app](https://deck-template-claude.vercel.app)
 
-`index.html` dosyasını doğrudan tarayıcıda açın veya herhangi bir statik hosting servisine dağıtın.
+## Features
 
-## Lisans
+- Keyboard- and button-based slide navigation
+- Cards, tables, equations, evidence labels, and source panels
+- Interactive animations with reduced-motion support
+- Full-screen mode and print-to-PDF support
+- Static structure with no external runtime dependencies
 
-Bu depoda ayrı bir lisans dosyası bulunmuyor. Yeniden kullanım ve dağıtım koşulları için depo sahibinden izin alın.
+## Usage
+
+Open `index.html` directly in a browser or deploy it to any static hosting service.
+
+## License
+
+There is no separate license file in this repository. Contact the repository owner for reuse and distribution terms.
